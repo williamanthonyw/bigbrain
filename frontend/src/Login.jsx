@@ -1,9 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
-
-function Login() {
-
+function Login(props) {
+  const success = props.setfunction;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -11,16 +10,16 @@ function Login() {
     console.log(email, password);
 
     try{
-      const response = await axios.post('http://localhost:5005/admin/auth/register', {
+      const response = await axios.post('http://localhost:5005/admin/auth/login', {
         email: email,
         password: password,
       });
       
       const token = response.data.token;
-      console.log(token);
+      success(token);
     }
     catch(err){
-      console.log(err.response.data.error);
+      alert(err.response.data.error);
     }
 
   };

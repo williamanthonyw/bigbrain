@@ -1,13 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 
-
-function Register() {
-
+function Register(props) {
+  const success = props.setfunction;
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
 
   const register = async () => {
     console.log(email, password);
@@ -20,10 +18,11 @@ function Register() {
       });
         
       const token = response.data.token;
-      console.log(token);
+      success(token);
+
     }
     catch(err){
-      console.log(err.response.data.error);
+      alert(err.response.data.error);
     }
 
   };
