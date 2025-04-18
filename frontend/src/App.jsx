@@ -3,7 +3,8 @@ import axios from "axios";
 import {
   BrowserRouter as Router, 
   Routes, 
-  Route
+  Route,
+  useNavigate
 } from "react-router-dom";
 
 import Home from './Home';
@@ -27,18 +28,28 @@ function App() {
   }, [token]);
   
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/login" element={<Login token={token} setfunction={setToken} />}></Route>
-          <Route path="/register" element={<Register token={token} setfunction={setToken} />}></Route>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
-        </Routes>
-      </Router>
-
-    </>
-  )
+    <Router>
+      <AppRoutes token={token} setToken={setToken}/>
+    </Router>
+  );
 }
+
+function AppRoutes({ token, setToken }) {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    setToken(null);        
+    navigate('/');         
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={<Home token={token} />} />
+      <Route path="/login" element={<Login token={token} setfunction={setToken} />} />
+      <Route path="/register" element={<Register token={token} setfunction={setToken} />} />
+      <Route path="/dashboard" element={<Dashboard logout={logout} />} />
+    </Routes>
+  );
+};
 
 export default App
