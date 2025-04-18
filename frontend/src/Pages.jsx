@@ -65,8 +65,8 @@ function Pages() {
       )}
       <hr />
       <Routes>
-        <Route path="/register" element={<Register setfunction={loggingIn}/>}/>
-        <Route path="/login" element={<Login setfunction={loggingIn}/>}/>
+        <Route path="/register" element={<Register token={token} setfunction={loggingIn}/>}/>
+        <Route path="/login" element={<Login token={token} setfunction={loggingIn}/>}/>
         <Route path="/dashboard" element={<Dashboard />}/>
       </Routes>
    

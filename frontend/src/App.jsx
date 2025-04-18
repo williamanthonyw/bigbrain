@@ -3,11 +3,13 @@ import axios from "axios";
 
 
 import {
-  BrowserRouter as Router,
-
+  BrowserRouter as Router, 
+  Routes, 
+  Route
 } from "react-router-dom";
 
-import Pages from "./Pages";
+import Home from './Home';
+import Login from "./Login";
 
 function App() {
 
@@ -15,7 +17,10 @@ function App() {
   return (
     <>
       <Router>
-        <Pages />
+        <Routes>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/login" element={<Login />}></Route>
+        </Routes>
       </Router>
 
     </>
