@@ -9,6 +9,7 @@ import {
 import Home from './Home';
 import Login from "./Login";
 import Dashboard from "./Dashboard";
+import Register from "./Register";
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/login" element={<Login token={token} setfunction={setToken} />}></Route>
+          <Route path="/register" element={<Register token={token} setfunction={setToken} />}></Route>
           <Route path="/dashboard" element={<Dashboard />}></Route>
         </Routes>
       </Router>

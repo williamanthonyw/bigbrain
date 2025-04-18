@@ -1,21 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Container, Form, Button } from "react-bootstrap";
+import brainImg from './assets/brain.png';
 
 function Register(props) {
   const success = props.setfunction;
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const navigate = useNavigate();
 
-  if (props.token){
-    navigate('/dashboard');
-  }
+  useEffect(() => {
+    if (props.token) {
+      navigate('/dashboard');
+    }
+  }, [props.token, navigate]);
 
   const register = async () => {
-    console.log(email, password);
+    console.log(username, email, password);
+
+    // checking for matching password input
+    if (password !== confirmPassword) {
+      alert("Passwords do not amtch.");
+      return;
+    }
 
     try{
       const response = await axios.post('http://localhost:5005/admin/auth/register', {
@@ -29,19 +40,45 @@ function Register(props) {
 
     }
     catch(err){
-      alert(err.response.data.error);
+      alert(err.response?.data?.error || "Registration failed.");
     }
 
   };
 
   return (
     <>
-      <div>
-        <h1>Register</h1>
-        Username: <input value={username} onChange={(e) => setUsername(e.target.value)} type="text"></input> <br />
-        Email: <input value={email} onChange={(e) => setEmail(e.target.value)} type="text"></input> <br />
-        Password: <input value={password} onChange={(e) => setPassword(e.target.value)} type="password"></input> <br />
-        <button onClick={register}>Register</button>
+      <style>
+        {`
+          .form-input::placeholder {
+            color: #b9bbbe;
+            opacity: 1;
+          }
+        `}
+      </style>
+      <div className="d-flex flex-column justify-content-center align-items-center vh-100" style={{ background: "linear-gradient(145deg, #2c2f33, #23272a" }}>
+        <img src={brainImg} alt="Brain Logo" className="mb-3" style={{ width: "80px", height: "80px" }} />
+        <Container className="p-5 rounded shadow text-center"  style={{ backgroundColor: "#36393f", maxWidth: "400px", color: "white" }}>
+          <h2 className="mb-4">Register</h2>
+          <Form onSubmit={(e) => {
+            e.preventDefault();
+            register();
+          }}>
+            <Form.Group controlId="form-username">
+              <Form.Control type="text" placeholder="Enter username" value={username} onChange={(e) => setUsername(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
+            </Form.Group>
+            <Form.Group controlId="form-email">
+              <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e) => setEmail(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
+            </Form.Group>
+            <Form.Group controlId="form-password">
+              <Form.Control type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
+            </Form.Group>
+            <Form.Group controlId="form-confirm-password">
+              <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
+            </Form.Group>
+            <Button variant="primary" type="submit" className="w-100" style={{ backgroundColor: "#7289da", border: "none" }}> Register</Button>
+            <a href="/login" className="text-white mt-3 d-block" style={{ bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" }}>Existing user? log in here</a>
+          </Form>        
+        </Container>
       </div>
     </>
   )

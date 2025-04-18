@@ -63,6 +63,7 @@ function Login(props) {
               <Form.Control type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
             </Form.Group>
             <Button variant="primary" type="submit" className="w-100" style={{ backgroundColor: "#7289da", border: "none" }}> Log In</Button>
+            <a href="/register" className="text-white mt-3 d-block" style={{ bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" }}>New user? Register here</a>
           </Form>        
         </Container>
       </div>
