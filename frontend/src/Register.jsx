@@ -17,10 +17,10 @@ function Register(props) {
     if (props.token) {
       navigate('/dashboard');
     }
+    console.log(props.token);
   }, [props.token, navigate]);
 
   const register = async () => {
-    console.log(username, email, password);
 
     // checking for matching password input
     if (password !== confirmPassword) {

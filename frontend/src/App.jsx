@@ -38,9 +38,20 @@ function App() {
 function AppRoutes({ token, setToken }) {
   const navigate = useNavigate();
 
-  const logout = () => {
-    setToken(null);        
-    navigate('/');         
+  const logout = async () => {
+    try{
+      await axios.post('http://localhost:5005/admin/auth/logout', {}, {
+        headers: {
+          Authorization: `Bearer ${token}` 
+        }
+      });
+      setToken(null);        
+      navigate('/');   
+    }
+    catch(err){
+      alert(err.response?.data?.error || "Logout failed.");
+    }
+          
   };
 
   return (
