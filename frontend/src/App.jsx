@@ -11,6 +11,7 @@ import Home from './Home';
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Register from "./Register";
+import Play from "./Play";
 
 function App() {
 
@@ -45,6 +46,7 @@ function AppRoutes({ token, setToken }) {
   return (
     <Routes>
       <Route path="/" element={<Home token={token} />} />
+      <Route path="/play" element={<Play token={token} />} />
       <Route path="/login" element={<Login token={token} setfunction={setToken} />} />
       <Route path="/register" element={<Register token={token} setfunction={setToken} />} />
       <Route path="/dashboard" element={<Dashboard logout={logout} />} />
