@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import brainImg from './assets/brain.png';
 
 function Login(props) {
@@ -11,16 +10,16 @@ function Login(props) {
   const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     if (props.token){
       navigate('/dashboard');
     }
+    console.log(props.token);
   }, [props.token, navigate]);
   
 
   const login = async () => {
-    console.log(email, password);
 
     try{
       const response = await axios.post('http://localhost:5005/admin/auth/login', {
