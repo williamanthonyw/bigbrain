@@ -13,7 +13,7 @@ function Login(props) {
   
   useEffect(() => {
     if (props.token){
-      navigate('/dashboard');
+      navigate('/temp');
     }
     console.log(props.token);
   }, [props.token, navigate]);

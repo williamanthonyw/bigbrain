@@ -12,6 +12,7 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Register from "./Register";
 import Play from "./Play";
+import Temp from "./Temp";
 
 function App() {
 
@@ -61,6 +62,7 @@ function AppRoutes({ token, setToken }) {
       <Route path="/login" element={<Login token={token} setfunction={setToken} />} />
       <Route path="/register" element={<Register token={token} setfunction={setToken} />} />
       <Route path="/dashboard" element={<Dashboard logout={logout} />} />
+      <Route path="/temp" element={<Temp logout={logout} token={token} />} />
     </Routes>
   );
 };
