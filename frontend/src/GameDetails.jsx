@@ -13,7 +13,7 @@ function GameDetails(props){
   const [newTitle, setNewTitle] = useState(game?.title || "");
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [showThumbnailModal, setShowThumbnailModal] = useState(false);
-  const [newThumbnail, setNewThumbnail] = useState('');
+  const [newThumbnail, setNewThumbnail] = useState(game?.thumbnail || "");
   const [isHovered, setIsHovered] = useState(false);
 
   const openTitleModal = () => {
@@ -58,6 +58,95 @@ function GameDetails(props){
     }
   };
 
+  const openThumbnailModal = () => {
+    setNewTitle(game.thumbnail);
+    setShowThumbnailModal(true);
+  };
+
+  const closeThumbnailModal = () => {
+    setShowThumbnailModal(false);
+  };
+
+  const handleThumbnailFileChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+  
+    reader.onloadend = () => {
+      setNewThumbnail(reader.result); // base64 string as thumbnail
+    };
+  
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveThumbnail = async () => {
+    try {
+      const response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      const updatedGames = response.data.games.map(g => {
+        if (g.id === game.id) {
+          return { ...g, thumbnail: newThumbnail ? newThumbnail : null }; // ⬅️ Use the URL or base64 string
+        }
+        return g;
+      });
+  
+      await axios.put('http://localhost:5005/admin/games', {
+        games: updatedGames
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      setGame(prev => ({ ...prev, thumbnail: newThumbnail ? newThumbnail : null}));
+      setShowThumbnailModal(false);
+    } catch (err) {
+      console.error("Error updating thumbnail:", err);
+    }
+  };
+
+  const removeThumbnail = async () => {
+
+    const confirmed = window.confirm("Are you sure you want to remove the thumbnail?");
+    if (!confirmed) return;
+    try {
+      const response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      const updatedGames = response.data.games.map(g => {
+        if (g.id === game.id) {
+          return { ...g, thumbnail: null };
+        }
+        return g;
+      });
+  
+      await axios.put('http://localhost:5005/admin/games', {
+        games: updatedGames
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      setGame(prev => ({ ...prev, thumbnail: null }));
+      setShowThumbnailModal(false);
+    } catch (err) {
+      console.error("Error removing thumbnail:", err);
+    }
+  };
+  
 
 
   useEffect(() => {
@@ -142,7 +231,7 @@ function GameDetails(props){
 
               {/* Hover overlay */}
               <div
-                onClick={() => setShowThumbnailModal(true)}
+                onClick={openThumbnailModal}
                 className="d-flex justify-content-center align-items-center"
                 style={{
                   position: 'absolute',
@@ -184,6 +273,25 @@ function GameDetails(props){
         <Modal.Footer>
           <Button variant="danger" onClick={closeTitleModal}>Cancel</Button>
           <Button variant="primary" onClick={saveTitle}>Save</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showThumbnailModal} onHide={closeThumbnailModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Upload Thumbnail</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <input
+            type="file"
+            accept="image/*"
+            className="form-control"
+            onChange={handleThumbnailFileChange}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={closeThumbnailModal}>Cancel</Button>
+          <Button variant="secondary" onClick={removeThumbnail}>Remove</Button>
+          <Button variant="primary" onClick={saveThumbnail}>Upload</Button>
         </Modal.Footer>
       </Modal>
     </>
