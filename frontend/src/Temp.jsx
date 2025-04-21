@@ -2,10 +2,13 @@ import brainImg from './assets/brain.png';
 import { Button } from "react-bootstrap";
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Temp(props){
 
   const [games, setGames] = useState([]);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -32,6 +35,11 @@ function Temp(props){
     // return () => clearInterval(interval);
   }, []);
 
+  const handleGameClick = (game) =>{
+    console.log(game);
+    navigate(`/game/${game.id}`)
+  }
+
   return (
     <>
       <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", position: "relative" }}>
@@ -45,7 +53,18 @@ function Temp(props){
           <h2 className='text-white mb-4'>Admin Games</h2>
           {games.length > 0 ? (
             games.map((game, index) => (
-              <div key={index} className="text-white mb-2">
+              <div key={index} onClick={() => handleGameClick(game)}  
+                onMouseEnter={() => setHoveredIndex(index)} 
+                onMouseLeave={() => setHoveredIndex(null)} 
+                className="game-box text-white w-100 text-center" 
+                style={{
+                  backgroundColor: hoveredIndex === index ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                  borderRadius: '10px',
+                  padding: '15px 25px',
+                  marginBottom: '10px',
+                  transition: 'background-color 0.3s',
+                  cursor: 'pointer'
+                }}>
                 {game.title || `Game ${index + 1}`}
               </div>
             ))
