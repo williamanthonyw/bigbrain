@@ -147,7 +147,53 @@ function GameDetails(props){
     }
   };
   
+  const addQuestion = async () => {
+    try{
+      const response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      const existingIds = response.data.games.flatMap(g => g.questions?.map(q => q.id) || []);
+      let id;
+      do {
+        id = Math.floor(1000000 + Math.random() * 9000000).toString();
+      }   while (existingIds.includes(id));
 
+      const newQuestion = {
+        id: id,
+        title: "",
+        duration: 0,
+        points: 0,
+        media: "",
+        correctAnswers: [],
+        type: ""
+      };
+
+      const updatedGames = response.data.games.map(g => {
+        if (g.id == game.id){
+          return { ...g, questions: [...(g.questions || []), newQuestion]};
+        }
+        return g;
+      });
+
+      await axios.put('http://localhost:5005/admin/games', {
+        games: updatedGames
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setGame(prev => ({ ...prev, questions: [...(prev.questions || []), newQuestion]}));
+    }
+    catch (err){
+      console.error("Error adding question:", err);
+    } 
+  };
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -191,12 +237,12 @@ function GameDetails(props){
 
   return (
     <>
-      <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", position: "relative", color: "white", paddingTop: '80px' }}>
+      <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", display: 'flex', flexDirection:'column', position: "relative", color: "white", paddingTop: '80px' }}>
         <Button variant='danger' onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
         <Button variant='light' onClick={goBack} style={{ position: "absolute", top: "20px", left: "20px" }}> ← Back</Button>
         {game ? (
           <>
-            <div className='mt-5 mb-5 text-center d-flex justify-content-center align-items-center gap-2'>
+            <div className='mt-5 mb-5 text-center d-flex justify-content-center align-items-center gap-2' style={{ flexGrow: 1}}>
               <h2 className='m-0'>{game.title}</h2>
               <Button variant="outline-none" size="sm" onClick={openTitleModal}>✏️</Button>
               <div className="position-relative ms-4"
@@ -259,28 +305,33 @@ function GameDetails(props){
             <div className="mt-3"
               style={{
                 width: 'fit-content',
-                height: '300px',
-                margin: '0 auto'
+                minHeight: '300px',
+                margin: '0 auto',
+                flexGrow: 1
               }}
             >
               {game.questions ? (
                 game.questions.map((question, index) => (
                   <div key={index} className="mb-3 p-3 rounded" style={{
-                    minWidth: "300px",
+                    minWidth: "400px",
                     width: '50vw',
+                    minHeight: "120px",
+                    height: '10vh',
                     backgroundColor: '#2f3136',
                     color: '#dcddde',
                     border: '1px solid #444',
                   }}>
-                    <div><strong>Question {index+1}</strong></div>
-                    {question.type ? <div>Type: {question.type}</div> : <div></div>}
-                    {question.duration ? <div>Duration: {question.duration}</div> : <div></div>}
+                    <div className="mb-4"><strong style={{ fontSize: '1.5rem' }}>Question {index+1}</strong></div>
+                    <div className="d-flex justify-content-between">
+                      {question.type ? <div className="text-start">Type: {question.type}</div> : <div></div>}
+                      {question.duration !== 0 ? <div className="text-end">Duration: {question.duration} seconds</div> : <div></div>}
+                    </div>
                   </div>
                 ))
               ) : (
                 <div style={{ height: '20px' }}></div>
               )}
-              <Button variant="primary" className="w-100">Add Question</Button>
+              <Button variant="primary" onClick={addQuestion} className="w-100">Add Question</Button>
             </div>   
           </>
         ) : (
