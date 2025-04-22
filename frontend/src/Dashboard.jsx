@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import brainImg from './assets/brain.png';
-import { Button, Form, FormControl, FormGroup, FormLabel, Modal } from "react-bootstrap";
+import { Alert, Button, Fade, Form, FormControl, FormGroup, FormLabel, Modal } from "react-bootstrap";
 
 function Dashboard(props){
   const token = props.token;
@@ -9,6 +9,9 @@ function Dashboard(props){
   const [newThumbnail, setNewThumbnail] = useState("");
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [validated, setValidated] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const openNewGameModal = () => {
     setShowNewGameModal(true);
@@ -17,6 +20,12 @@ function Dashboard(props){
   const closeNewGameModal = () => {
     setShowNewGameModal(false);
   };
+
+  const handleNewGameModalExited = () => {
+    setNewTitle("");
+    setNewThumbnail("");
+    setValidated(false);
+  }
 
   const handleThumbnailFileChange = (e) => {
     const file = e.target.files[0];
@@ -54,7 +63,8 @@ function Dashboard(props){
       return;
     }
     try{
-      const response = await axios.get('http://localhost:5005/admin/games', {
+      // get full list of games, append new game then put
+      let response = await axios.get('http://localhost:5005/admin/games', {
         headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${token}`
@@ -72,7 +82,7 @@ function Dashboard(props){
       };
       const updatedGames = [...games, newGame];
 
-      await axios.put('http://localhost:5005/admin/games', {
+      response = await axios.put('http://localhost:5005/admin/games', {
         games: updatedGames
       }, {
         headers: {
@@ -80,11 +90,19 @@ function Dashboard(props){
           Authorization: `Bearer ${token}`
         }
       })
-      setShowNewGameModal(false);
+      if (response.status === 200) {
+        setShowNewGameModal(false);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 3000);
+      }
     }
 
     catch (err){
       console.error("Error creating game: ", err);
+      const msg = err.response?.data?.error || err.message || "Something went wrong :c";
+      setErrorMessage(msg);
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 5000);
     }
   };
 
@@ -98,7 +116,7 @@ function Dashboard(props){
           Create new game ✏️
         </Button>
       </div>
-      <Modal show={showNewGameModal} onHide={closeNewGameModal} centered>
+      <Modal show={showNewGameModal} onHide={closeNewGameModal} onExited={handleNewGameModalExited} centered>
         <Form noValidate validated={validated} onSubmit={createGame}>
           <Modal.Header closeButton>
             <Modal.Title>Create new game ✏️</Modal.Title>
@@ -130,6 +148,32 @@ function Dashboard(props){
           </Modal.Footer>
         </Form>
       </Modal>
+      <Fade in={showSuccessAlert}>
+        <div>
+          <Alert
+            variant="success"
+            className="position-fixed top-0 start-50 translate-middle-x mt-3"
+            style={{ zIndex: 1051 }}
+            dismissible
+            onClose={() => setShowSuccessAlert(false)}
+          >
+            Game created successfully!
+          </Alert>
+        </div>
+      </Fade>
+      <Fade in={showErrorAlert}>
+        <div>
+          <Alert
+            variant="danger"
+            className="position-fixed top-0 start-50 translate-middle-x mt-3"
+            style={{ zIndex: 1051 }}
+            dismissible
+            onClose={() => setShowErrorAlert(false)}
+          >
+            <strong>Error:</strong> {errorMessage}
+          </Alert>
+        </div>
+      </Fade>
     </>
   );
   
