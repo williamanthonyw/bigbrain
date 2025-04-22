@@ -208,8 +208,6 @@ function QuestionDetails(props) {
   return (
     <>
       <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", display: 'flex', flexDirection:'column', position: "relative", color: "white", paddingTop: '80px' }}>
-        <Button variant='danger' onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
-        <Button variant='light' onClick={goBack} style={{ position: "absolute", top: "20px", left: "20px" }}> ← Back</Button>
         <div className="d-flex flex-grow-1 mt-5" style={{ padding: '1rem' }}>
           <div style={{ flex: 4, paddingRight: '1rem'}}>
             left container
@@ -376,6 +374,7 @@ function QuestionDetails(props) {
               <Form.Control type="number" min="0" value={questionPoints} onChange={(e) => setQuestionPoints(e.target.value)} className="bg-dark text-white border-secondary"/>
             </Form.Group>
             <Button variant="success" className="mt-3 w-100" onClick={saveQuestion}>Save</Button>
+            <Button variant="danger" className="mt-3 w-100" onClick={goBack}>Cancel</Button>
           </div>
         </div>
       </div>

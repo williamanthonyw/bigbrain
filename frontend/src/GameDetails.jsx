@@ -230,6 +230,43 @@ function GameDetails(props){
     }
   };
 
+  const deleteQuestion = async (questionId) => {
+    if (!window.confirm('Are you sure you want to delete this question?')) return;
+  
+    try {
+      const response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      const games = response.data.games;
+      const gameIndex = games.findIndex(g => g.id === game.id);
+  
+      const updatedQuestions = games[gameIndex].questions.filter(q => q.id !== questionId);
+      games[gameIndex].questions = updatedQuestions;
+  
+      await axios.put('http://localhost:5005/admin/games', {
+        games
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      setGame(prev => ({
+        ...prev,
+        questions: updatedQuestions
+      }));
+  
+    } catch (err) {
+      console.error('Error deleting question:', err);
+      alert('Failed to delete question.');
+    }
+  };
+
   // if (game){
   //   console.log(game.questions);
   // }
@@ -311,7 +348,7 @@ function GameDetails(props){
             >
               {game.questions ? (
                 game.questions.map((question, index) => (
-                  <div key={index} className="mb-3 p-3 rounded" onClick={() => navigate(`/game/${game.id}/question/${question.id}`)}style={{
+                  <div key={index} className="mb-3 p-3 rounded d-flex justify-content-between align-items-start"style={{
                     minWidth: "400px",
                     width: '50vw',
                     minHeight: "120px",
@@ -324,11 +361,20 @@ function GameDetails(props){
                   }}
                   onMouseEnter={e => e.currentTarget.style.backgroundColor = '#3a3d42'}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor = '#2f3136'}>
-                    <div className="mb-4"><strong style={{ fontSize: '1.5rem' }}>Question {index+1}</strong></div>
-                    <div className="d-flex justify-content-between">
-                      {question.type ? <div className="text-start">Type: {question.type}</div> : <div></div>}
-                      {question.duration !== 0 ? <div className="text-end">Duration: {question.duration} seconds</div> : <div></div>}
-                    </div>
+                    <div onClick={() => navigate(`/game/${game.id}/question/${question.id}`)} style={{ flexGrow: 1}}>
+                      <div className="mb-4"><strong style={{ fontSize: '1.5rem' }}>Question {index+1}</strong></div>
+                      <div className="d-flex justify-content-between">
+                        {question.type ? <div className="text-start">Type: {question.type}</div> : <div></div>}
+                        {question.duration !== 0 ? <div className="text-end">Duration: {question.duration} seconds</div> : <div></div>}
+                      </div>
+                    </div> 
+                    <i className="bi bi-trash text-danger ms-3" style={{ cursor: 'pointer', fontSize: '1.2rem' }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // prevent navigating on icon click
+                        deleteQuestion(question.id);
+                      }}
+                    />
+
                   </div>
                 ))
               ) : (
