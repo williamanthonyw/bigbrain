@@ -14,7 +14,6 @@ function GameDetails(props){
   const [showThumbnailModal, setShowThumbnailModal] = useState(false);
   const [newThumbnail, setNewThumbnail] = useState(game?.thumbnail || "");
   const [isHovered, setIsHovered] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(0);
 
   const openTitleModal = () => {
     setNewTitle(game.title);
@@ -312,7 +311,7 @@ function GameDetails(props){
             >
               {game.questions ? (
                 game.questions.map((question, index) => (
-                  <div key={index} className="mb-3 p-3 rounded" style={{
+                  <div key={index} className="mb-3 p-3 rounded" onClick={() => navigate(`/game/${game.id}/question/${question.id}`)}style={{
                     minWidth: "400px",
                     width: '50vw',
                     minHeight: "120px",
@@ -320,7 +319,11 @@ function GameDetails(props){
                     backgroundColor: '#2f3136',
                     color: '#dcddde',
                     border: '1px solid #444',
-                  }}>
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#3a3d42'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#2f3136'}>
                     <div className="mb-4"><strong style={{ fontSize: '1.5rem' }}>Question {index+1}</strong></div>
                     <div className="d-flex justify-content-between">
                       {question.type ? <div className="text-start">Type: {question.type}</div> : <div></div>}

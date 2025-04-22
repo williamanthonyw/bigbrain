@@ -14,6 +14,7 @@ import Register from "./Register";
 import Play from "./Play";
 import Temp from "./Temp";
 import GameDetails from "./GameDetails";
+import QuestionDetails from "./QuestionDetails";
 
 function App() {
 
@@ -65,6 +66,7 @@ function AppRoutes({ token, setToken }) {
       <Route path="/dashboard" element={<Dashboard logout={logout} />} />
       <Route path="/temp" element={<Temp logout={logout} token={token} />} />
       <Route path="/game/:id" element={<GameDetails token={token} logout={logout}/>} />
+      <Route path="/game/:gameId/question/:questionId" element={<QuestionDetails token={token} logout={logout}/>} />
     </Routes>
   );
 };
