@@ -118,6 +118,35 @@ function QuestionDetails(props) {
   };
 
   const saveQuestion = async () => {
+
+    if (!questionTitle.trim()) {
+      alert('Question title cannot be empty.');
+      return;
+    }
+
+    if ((questionType === 'single' || questionType === 'multiple')) {
+      const emptyAnswerIndex = answers.findIndex(ans => !ans.trim());
+      if (emptyAnswerIndex !== -1) {
+        alert(`Answer ${emptyAnswerIndex + 1} cannot be empty.`);
+        return;
+      }
+    }
+
+    if (questionType === 'single' && correctAnswers.length !== 1) {
+      alert('Please select one correct answer.');
+      return;
+    }
+
+    if (questionType === 'multiple' && correctAnswers.length < 1) {
+      alert('Please select at least one correct answer.');
+      return;
+    }
+
+    if (questionType === 'judgement' && correctAnswers.length !== 1) {
+      alert('Please select one correct answer.');
+      return;
+    }
+
     try {
       const response = await axios.get('http://localhost:5005/admin/games', {
         headers: {
@@ -321,8 +350,9 @@ function QuestionDetails(props) {
             <Form.Group controlId="questionType" className="mb-3">
               <Form.Label className="text-white"><strong>Question type</strong></Form.Label>
               <Form.Select value={questionType} onChange={(e) => {
-                setQuestionType(e.target.value);
-                if (questionType === 'judgement'){
+                const type = e.target.value;
+                setQuestionType(type);
+                if (type === 'judgement'){
                   setAnswers(['True', 'False']);
                   setCorrectAnswers([]);
                 }
