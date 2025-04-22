@@ -11,8 +11,13 @@ function QuestionDetails(props) {
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [mediaType, setMediaType] = useState('image');
   const [questionMedia, setQuestionMedia] = useState(null);
+  const [questionType, setQuestionType] = useState("");
+  const [answers, setAnswers] = useState(['', '']); // starts with 2 answers
+  const [correctAnswers, setCorrectAnswers] = useState([]); // index(es) of correct ones
+
 
   const navigate = useNavigate();
+  const maxAnswer = 6;
 
   const goBack = () => {
     if (token){
@@ -59,6 +64,9 @@ function QuestionDetails(props) {
 
         setQuestion(findQuestion);
         setQuestionTitle(findQuestion.title || "");
+        setQuestionType(findQuestion.type || "single");
+        setAnswers(findQuestion.answers || ['', '']); // fallback to 2 blanks
+        setCorrectAnswers(findQuestion.correctAnswers || []); // fallback to empty
       }
 
       catch (err){
@@ -67,6 +75,34 @@ function QuestionDetails(props) {
     };
     fetchQuestion();
   }, [gameId, questionId, token]);
+
+  const handleAnswerChange = (index, value) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[index] = value;
+    setAnswers(updatedAnswers);
+  }
+
+  const handleCorrectSelect = (index) => {
+    setCorrectAnswers([index]);
+  }
+
+  const addAnswerField = () => {
+    if (answers.length < 6) {
+      setAnswers([...answers, '']);
+    }
+  }
+
+  const deleteAnswerField = (index) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers.splice(index, 1);
+  
+    const updatedCorrectAnswers = correctAnswers
+      .filter(i => i !== index) 
+      .map(i => (i > index ? i - 1 : i)); 
+  
+    setAnswers(updatedAnswers);
+    setCorrectAnswers(updatedCorrectAnswers);
+  };
 
   if (question){
     console.log(question);
@@ -150,6 +186,24 @@ function QuestionDetails(props) {
                     <i className="bi bi-pencil-fill" style={{ fontSize: '2.5rem', color: '#2f3136' }}></i>
                   </div>
                 </div>
+                {questionType === 'single' && (
+                  <div className="mt-5">
+                    <Form.Label className="text-white mb-4">Answer Options</Form.Label>
+                    {answers.map((answer, index) => (
+                      <div key={index} className="d-flex align-items-center mb-4">
+                        <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(index)} onChange={() => handleCorrectSelect(index)} className="me-2"/>
+                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
+                        {index >= 2 && (
+                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
+                        )}
+                      </div>
+                    ))}
+                    {answers.length < 6 && (
+                      <Button variant="outline-light" onClick={addAnswerField} size="sm" className="mt-2">+ Add Answer</Button>
+                    )}
+                  </div>
+                )}
+
               </>
             ) : (
               <p>Loading question...</p>
@@ -157,6 +211,14 @@ function QuestionDetails(props) {
           </div>
           <div style={{ flex: 1, backgroundColor: '#1e2124', borderLeft: '1px solid #444', padding: '1rem'}}>
             right container
+            <Form.Group controlId="questionType" className="mb-3">
+              <Form.Label className="text-white"><strong>Question type</strong></Form.Label>
+              <Form.Select value={questionType} onChange={(e) => setQuestionType(e.target.value)} className="bg-dark text-white border-secondary">
+                <option value="single">Single Choice</option>
+                <option value="multiple">Multiple Choice</option>
+                <option value="judgement">Judgement</option>
+              </Form.Select>
+            </Form.Group>
           </div>
         </div>
       </div>
