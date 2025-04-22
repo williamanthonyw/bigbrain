@@ -91,6 +91,14 @@ function QuestionDetails(props) {
     setCorrectAnswers([index]);
   }
 
+  const toggleCorrectAnswer = (index) => {
+    if (correctAnswers.includes(index)) {
+      setCorrectAnswers(correctAnswers.filter(i => i !== index));
+    } else {
+      setCorrectAnswers([...correctAnswers, index]);
+    }
+  };
+
   const addAnswerField = () => {
     if (answers.length < 6) {
       setAnswers([...answers, '']);
@@ -130,8 +138,8 @@ function QuestionDetails(props) {
             type: questionType,
             answers: answers,
             correctAnswers: correctAnswers,
-            duration: questionDuration,
-            points: questionPoints
+            duration: Number(questionDuration),
+            points: Number(questionPoints)
           };
         }
         return q;
@@ -252,10 +260,27 @@ function QuestionDetails(props) {
                     {answers.map((answer, index) => (
                       <div key={index} className="d-flex align-items-center mb-4">
                         <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(index)} onChange={() => handleCorrectSelect(index)} className="me-2"/>
-                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"
-                          style={{
-                            paddingRight: index < 2 ? '2rem' : undefined
-                          }}/>
+                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
+                        {index >= 2 ? (
+                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
+                        ) : (
+                          <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
+                        )}
+                      </div>
+                    ))}
+                    {answers.length < maxAnswer && (
+                      <Button variant="outline-light" onClick={addAnswerField} size="sm" className="mt-2">+ Add Answer</Button>
+                    )}
+                  </div>
+                )}
+
+                {questionType === 'multiple' && (
+                  <div className="mt-5">
+                    <Form.Label className="text-white mb-4">Answer Options</Form.Label>
+                    {answers.map((answer, index) => (
+                      <div key={index} className="d-flex align-items-center mb-4">
+                        <Form.Check type="checkbox" checked={correctAnswers.includes(index)} onChange={() => toggleCorrectAnswer(index)} className="me-2"/>
+                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
                         {index >= 2 ? (
                           <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
                         ) : (
@@ -278,7 +303,18 @@ function QuestionDetails(props) {
             right container
             <Form.Group controlId="questionType" className="mb-3">
               <Form.Label className="text-white"><strong>Question type</strong></Form.Label>
-              <Form.Select value={questionType} onChange={(e) => setQuestionType(e.target.value)} className="bg-dark text-white border-secondary">
+              <Form.Select value={questionType} onChange={(e) => {
+                setQuestionType(e.target.value);
+                if (questionType === 'judgement'){
+                  setAnswers(['True', 'False']);
+                  setCorrectAnswers([]);
+                }
+                else{
+                  setAnswers(['', '']);
+                  setCorrectAnswers([]);
+                }
+              }} 
+              className="bg-dark text-white border-secondary">
                 <option value="single">Single Choice</option>
                 <option value="multiple">Multiple Choice</option>
                 <option value="judgement">Judgement</option>
