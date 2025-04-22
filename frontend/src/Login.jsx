@@ -13,7 +13,7 @@ function Login(props) {
   
   useEffect(() => {
     if (props.token){
-      navigate('/temp');
+      navigate('/dashboard');
     }
     console.log(props.token);
   }, [props.token, navigate]);
@@ -29,6 +29,8 @@ function Login(props) {
       
       const token = response.data.token;
       success(token);
+      // store email for use when creating games in Dashboard
+      localStorage.setItem("email", email);
     }
     catch(err){
       const message = err.response?.data?.error || "Login failed. Please try again.";

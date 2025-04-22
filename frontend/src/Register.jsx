@@ -36,8 +36,9 @@ function Register(props) {
       });
         
       const token = response.data.token;
+      // store email for use when creating games in Dashboard
+      localStorage.setItem("email", email);
       success(token);
-
     }
     catch(err){
       alert(err.response?.data?.error || "Registration failed.");
