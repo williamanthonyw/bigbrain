@@ -294,6 +294,23 @@ function QuestionDetails(props) {
                   </div>
                 )}
 
+                {questionType === 'judgement' && (
+                  <div className="mt-5">
+                    <Form.Label className="text-white mb-4">Answer Options</Form.Label>
+                    
+                    <div className="d-flex align-items-center mb-3">
+                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(0)} onChange={() => setCorrectAnswers([0])} className="me-2"/>
+                      <Form.Control type="text" value="True" disabled className="bg-dark text-white border-secondary"/>
+                    </div>
+                    <div className="d-flex align-items-center mb-3">
+                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(1)} onChange={() => setCorrectAnswers([1])} className="me-2"/>
+                      <Form.Control type="text" value="False" disabled className="bg-dark text-white border-secondary"/>
+                    </div>
+                    <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
+                   
+                  </div>
+                )}
+
               </>
             ) : (
               <p>Loading question...</p>
