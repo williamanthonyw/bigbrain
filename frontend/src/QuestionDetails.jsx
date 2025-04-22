@@ -12,8 +12,10 @@ function QuestionDetails(props) {
   const [mediaType, setMediaType] = useState('image');
   const [questionMedia, setQuestionMedia] = useState(null);
   const [questionType, setQuestionType] = useState("");
-  const [answers, setAnswers] = useState(['', '']); // starts with 2 answers
-  const [correctAnswers, setCorrectAnswers] = useState([]); // index(es) of correct ones
+  const [answers, setAnswers] = useState(['', '']); 
+  const [correctAnswers, setCorrectAnswers] = useState([]);
+  const [questionDuration, setQuestionDuration] = useState(0);
+  const [questionPoints, setQuestionPoints] = useState(0);
 
 
   const navigate = useNavigate();
@@ -65,8 +67,11 @@ function QuestionDetails(props) {
         setQuestion(findQuestion);
         setQuestionTitle(findQuestion.title || "");
         setQuestionType(findQuestion.type || "single");
-        setAnswers(findQuestion.answers || ['', '']); // fallback to 2 blanks
-        setCorrectAnswers(findQuestion.correctAnswers || []); // fallback to empty
+        setQuestionMedia(findQuestion.media || null);
+        setAnswers(findQuestion.answers || ['', '']); 
+        setCorrectAnswers(findQuestion.correctAnswers || []);
+        setQuestionDuration(findQuestion.duration || 0);
+        setQuestionPoints(findQuestion.points || 0);
       }
 
       catch (err){
@@ -103,6 +108,61 @@ function QuestionDetails(props) {
     setAnswers(updatedAnswers);
     setCorrectAnswers(updatedCorrectAnswers);
   };
+
+  const saveQuestion = async () => {
+    try {
+      const response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const games = response.data.games;
+      const gameIndex = games.findIndex(g => g.id == gameId);
+
+      const updatedQuestions = games[gameIndex].questions.map(q => {
+        if (q.id == questionId){
+          return{
+            ...q,
+            title: questionTitle,
+            media: question.media,
+            type: questionType,
+            answers: answers,
+            correctAnswers: correctAnswers,
+            duration: questionDuration,
+            points: questionPoints
+          };
+        }
+        return q;
+      });
+
+      const updatedGames = [...games];
+      updatedGames[gameIndex].questions = updatedQuestions;
+
+      await axios.put('http://localhost:5005/admin/games', {
+        games: updatedGames
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      navigate(`/game/${gameId}`)
+    }
+
+    catch (err){
+      console.error('Failed to save question', err);
+    }
+  };
+
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // will give you base64 string
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   if (question){
     console.log(question);
@@ -192,13 +252,18 @@ function QuestionDetails(props) {
                     {answers.map((answer, index) => (
                       <div key={index} className="d-flex align-items-center mb-4">
                         <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(index)} onChange={() => handleCorrectSelect(index)} className="me-2"/>
-                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
-                        {index >= 2 && (
+                        <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"
+                          style={{
+                            paddingRight: index < 2 ? '2rem' : undefined
+                          }}/>
+                        {index >= 2 ? (
                           <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
+                        ) : (
+                          <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
                         )}
                       </div>
                     ))}
-                    {answers.length < 6 && (
+                    {answers.length < maxAnswer && (
                       <Button variant="outline-light" onClick={addAnswerField} size="sm" className="mt-2">+ Add Answer</Button>
                     )}
                   </div>
@@ -219,6 +284,15 @@ function QuestionDetails(props) {
                 <option value="judgement">Judgement</option>
               </Form.Select>
             </Form.Group>
+            <Form.Group controlId="questionDuration" className="mb-3">
+              <Form.Label className="text-white"><strong>Duration</strong></Form.Label>
+              <Form.Control type="number" min="0" value={questionDuration} onChange={(e) => setQuestionDuration(e.target.value)} className="bg-dark text-white border-secondary"></Form.Control>
+            </Form.Group>
+            <Form.Group controlId="questionPoints" className="mb-3">
+              <Form.Label className="text-white"><strong>Points</strong></Form.Label>
+              <Form.Control type="number" min="0" value={questionPoints} onChange={(e) => setQuestionPoints(e.target.value)} className="bg-dark text-white border-secondary"/>
+            </Form.Group>
+            <Button variant="success" className="mt-3 w-100" onClick={saveQuestion}>Save</Button>
           </div>
         </div>
       </div>
@@ -258,15 +332,20 @@ function QuestionDetails(props) {
           <Button variant="secondary" onClick={() => setShowMediaModal(false)}>Cancel</Button>
           <Button
             variant="primary"
-            onClick={() => {
-              const mediaURL = mediaType === 'image'
-                ? URL.createObjectURL(questionMedia)
-                : questionMedia
+            onClick={async () => {
+              let mediaUrl = question.media;
 
-              setQuestion(prev => ({ ...prev, media: mediaURL}));
+              if (mediaType === 'image' && questionMedia instanceof File) {
+                mediaUrl = await fileToBase64(questionMedia); 
+              } else if (mediaType === 'youtube') {
+                mediaUrl = questionMedia; 
+              }
+          
+              setQuestion(prev => ({...prev, media: mediaUrl}));
+              setQuestionMedia(null);
               setShowMediaModal(false);
-              console.log('Saved media:', questionMedia);
             }}
+
             disabled={
               (mediaType === 'image' && !questionMedia) ||
               (mediaType === 'youtube' && !questionMedia?.startsWith('http'))
