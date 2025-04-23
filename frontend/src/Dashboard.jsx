@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import brainImg from './assets/brain.png';
 import { Alert, Button, Card, CardBody, CardImg, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 function Dashboard(props){
   const token = props.token;
@@ -235,8 +236,14 @@ function Dashboard(props){
           <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.gameId}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p><strong>Game ID:</strong> {selectedGame?.gameId}</p>
-          <p><strong>Owner:</strong> {selectedGame?.owner}</p>
+          <div className="d-flex flex-column" style={{ gap: "10px" }}>
+            <Button variant="success" onClick={null}>Host</Button>
+            <Button variant="secondary" onClick={null}>View Past Results</Button>
+            <Link to={`/game/${selectedGame?.gameId}`}>
+              <Button variant="primary" style={{ width: "100%" }} onClick={null}>Edit</Button>
+            </Link>
+            <Button variant="danger" onClick={null}>Delete</Button>
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setSelectedGame(null)}>Close</Button>
