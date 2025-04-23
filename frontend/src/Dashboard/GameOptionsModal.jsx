@@ -1,12 +1,62 @@
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
 
 function GameOptionsModal({
+  token,
+  games,
+  setGames,
   selectedGame,
   setSelectedGame,
   showConfirmation,
-  deleteGame,
+  confirmDialog,
+  setConfirmDialog,
+  setErrorMessage,
+  setShowErrorAlert,
 }) {
+  // delete game from delete dialog, use selectedGame dialog to check for match
+  const deleteGame = async () => {
+    try {
+      // get full list of games, remove game then put
+      let response = await axios.get("http://localhost:5005/admin/games", {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const updatedGames = games.filter(
+        (game) => game.gameId !== selectedGame.gameId
+      );
+
+      response = await axios.put(
+        "http://localhost:5005/admin/games",
+        {
+          games: updatedGames,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        // hide modals
+        setConfirmDialog({ ...confirmDialog, show: false });
+        setSelectedGame(null);
+        setGames(updatedGames);
+      }
+    } catch (err) {
+      console.error("Error creating game: ", err);
+      const msg =
+        err.response?.data?.error || err.message || "Something went wrong :c";
+      setErrorMessage(msg);
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 5000);
+    }
+  };
+
   return (
     <Modal
       show={selectedGame !== null}

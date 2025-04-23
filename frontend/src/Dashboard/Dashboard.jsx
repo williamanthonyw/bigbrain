@@ -41,49 +41,6 @@ function Dashboard(props) {
     fetchGames();
   }, []);
 
-  // delete game from delete dialog, use selectedGame dialog to check for match
-  const deleteGame = async () => {
-    try {
-      // get full list of games, remove game then put
-      let response = await axios.get("http://localhost:5005/admin/games", {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const updatedGames = games.filter(
-        (game) => game.gameId !== selectedGame.gameId
-      );
-
-      response = await axios.put(
-        "http://localhost:5005/admin/games",
-        {
-          games: updatedGames,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        // hide modals
-        setConfirmDialog({ ...confirmDialog, show: false });
-        setSelectedGame(null);
-        setGames(updatedGames);
-      }
-    } catch (err) {
-      console.error("Error creating game: ", err);
-      const msg =
-        err.response?.data?.error || err.message || "Something went wrong :c";
-      setErrorMessage(msg);
-      setShowErrorAlert(true);
-      setTimeout(() => setShowErrorAlert(false), 5000);
-    }
-  };
-
   const showConfirmation = (title, message, variant, onConfirm) => {
     setConfirmDialog({
       show: true,
@@ -146,10 +103,16 @@ function Dashboard(props) {
         setErrorMessage={setErrorMessage}
       />
       <GameOptionsModal
+        token={token}
+        games={games}
+        setGames={setGames}
         selectedGame={selectedGame}
         setSelectedGame={setSelectedGame}
         showConfirmation={showConfirmation}
-        deleteGame={deleteGame}
+        confirmDialog={confirmDialog}
+        setConfirmDialog={setConfirmDialog}
+        setErrorMessage={setErrorMessage}
+        setShowErrorAlert={setShowErrorAlert}
       />
       <Modal
         show={confirmDialog.show}
