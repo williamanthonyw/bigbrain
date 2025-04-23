@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import brainImg from "../assets/brain.png";
 import { Alert, Button, Card, Fade, Modal } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
@@ -19,10 +18,7 @@ function Dashboard(props) {
     onConfirm: null,
   });
   const [selectedGame, setSelectedGame] = useState(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [newThumbnail, setNewThumbnail] = useState("");
   const [showNewGameModal, setShowNewGameModal] = useState(false);
-  const [validated, setValidated] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -143,12 +139,6 @@ function Dashboard(props) {
         onHide={() => {
           setShowNewGameModal(false);
         }}
-        newThumbnail={newThumbnail}
-        setNewThumbnail={setNewThumbnail}
-        validated={validated}
-        setValidated={setValidated}
-        newTitle={newTitle}
-        setNewTitle={setNewTitle}
         setShowNewGameModal={setShowNewGameModal}
         setGames={setGames}
         setShowSuccessAlert={setShowSuccessAlert}

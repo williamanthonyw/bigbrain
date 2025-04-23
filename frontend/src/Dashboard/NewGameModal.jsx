@@ -13,18 +13,15 @@ function NewGameModal({
   token,
   show,
   onHide,
-  newThumbnail,
-  setNewThumbnail,
-  validated,
-  setValidated,
-  newTitle,
-  setNewTitle,
   setShowNewGameModal,
   setGames,
   setShowSuccessAlert,
   setShowErrorAlert,
   setErrorMessage,
 }) {
+  const [newTitle, setNewTitle] = useState("");
+  const [newThumbnail, setNewThumbnail] = useState("");
+  const [validated, setValidated] = useState(false);
 
   const handleThumbnailFileChange = (e) => {
     const file = e.target.files[0];
@@ -120,7 +117,12 @@ function NewGameModal({
   };
 
   return (
-    <Modal show={show} onHide={onHide} onExited={handleNewGameModalExited} centered>
+    <Modal
+      show={show}
+      onHide={onHide}
+      onExited={handleNewGameModalExited}
+      centered
+    >
       <Form noValidate validated={validated} onSubmit={createGame}>
         <Modal.Header closeButton>
           <Modal.Title>Create new game ✏️</Modal.Title>
