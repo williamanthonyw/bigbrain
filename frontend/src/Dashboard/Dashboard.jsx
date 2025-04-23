@@ -3,7 +3,7 @@ import axios from 'axios';
 import brainImg from '../assets/brain.png';
 import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import GameCard from './GameCard';
+import GameList from './GameList';
 
 function Dashboard(props){
   const token = props.token;
@@ -203,40 +203,13 @@ function Dashboard(props){
           </div>
         </div>
         <h2 className="mb-4 text-white">All Games</h2>
-        <div className="container-fluid" style={{ overflowX: "auto"}}>
-          <div className="d-flex flex-row flex-nowrap">
-            <Button variant="primary" className="me-2" style={{minHeight: "12rem", width: "10rem", minWidth: "10rem"}} onClick={openNewGameModal}>
-              Create new game ✏️
-            </Button>
-            {games !== null ? (
-              // sort by most recently created
-              games.sort((a, b) => b.dateCreated - a.dateCreated).map((game, index) => (
-                <GameCard
-                  key={index}
-                  game={game}
-                  onClick={() => setSelectedGame(game)}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  isHovered={hoveredIndex === index}
-                />
-              ))
-            ) : (
-              [...Array(3)].map((e, i) => <span key={i}>
-                <Card style={{minHeight: "12rem", minWidth: "10rem"}}>
-                  <CardBody>
-                    <Placeholder as={CardTitle} animation="glow">
-                      <Placeholder xs={6} />
-                    </Placeholder>
-                    <Placeholder as={CardText} animation="glow">
-                      <Placeholder xs={7} /> <Placeholder xs={4} /> <Placeholder xs={4} />{' '}
-                      <Placeholder xs={6} /> <Placeholder xs={8} />
-                    </Placeholder>
-                  </CardBody>
-                </Card>
-              </span>)
-            )}
-          </div>
-        </div>
+        <GameList
+          games={games}
+          hoveredIndex={hoveredIndex}
+          setHoveredIndex={setHoveredIndex}
+          setSelectedGame={setSelectedGame}
+          openNewGameModal={(openNewGameModal)}
+        />
       </div>
       <Modal show={showNewGameModal} onHide={closeNewGameModal} onExited={handleNewGameModalExited} centered>
         <Form noValidate validated={validated} onSubmit={createGame}>
