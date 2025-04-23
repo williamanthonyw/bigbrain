@@ -10,7 +10,6 @@ import ConfirmDialogModal from "./ConfirmDialogModal";
 function Dashboard(props) {
   const token = props.token;
   const [games, setGames] = useState(null);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({
     show: false,
     title: "",
@@ -83,8 +82,6 @@ function Dashboard(props) {
         <h2 className="mb-4 text-white">All Games</h2>
         <GameList
           games={games}
-          hoveredIndex={hoveredIndex}
-          setHoveredIndex={setHoveredIndex}
           setSelectedGame={setSelectedGame}
           openNewGameModal={() => {
             setShowNewGameModal(true);
