@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import brainImg from "../assets/brain.png";
-import { Alert, Button, Card, Fade, Modal } from "react-bootstrap";
+import { Alert, Button, Card, Fade } from "react-bootstrap";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
