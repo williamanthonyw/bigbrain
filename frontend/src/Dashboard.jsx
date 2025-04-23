@@ -8,6 +8,13 @@ function Dashboard(props){
   const token = props.token;
   const [games, setGames] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    show: false,
+    title: "",
+    message: "",
+    variant: "",
+    onConfirm: null
+  });
   const [selectedGame, setSelectedGame] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newThumbnail, setNewThumbnail] = useState("");
@@ -131,11 +138,62 @@ function Dashboard(props){
     }
   };
 
+  // delete game from delete dialog, use selectedGame dialog to check for match
+  const deleteGame = async () => {
+    try{
+      // get full list of games, remove game then put
+      let response = await axios.get('http://localhost:5005/admin/games', {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const updatedGames = games.filter((game) => game.gameId !== selectedGame.gameId);
+
+      response = await axios.put('http://localhost:5005/admin/games', {
+        games: updatedGames
+      }, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if (response.status === 200) {
+        setShowNewGameModal(false);
+        // hide modals
+        setConfirmDialog({ ...confirmDialog, show: false });
+        setSelectedGame(null);
+        // setShowSuccessAlert(true);
+        // setTimeout(() => setShowSuccessAlert(false), 3000);
+        setGames(updatedGames);
+      }
+    }
+
+    catch (err){
+      console.error("Error creating game: ", err);
+      const msg = err.response?.data?.error || err.message || "Something went wrong :c";
+      setErrorMessage(msg);
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 5000);
+    }
+  };
+
   const getGameDuration = (game) => {
     return game.questions.reduce(
       (cumDuration, currentQuestion) => cumDuration + currentQuestion.duration, 0
     )
-  }
+  };
+
+  const showConfirmation = (title, message, variant, onConfirm) => {
+    setConfirmDialog({
+      show: true,
+      title,
+      message,
+      variant,
+      onConfirm
+    });
+  };
 
   return (
     <>
@@ -184,17 +242,19 @@ function Dashboard(props){
                 </Card>
               ))
             ) : (
-              <Card style={{minHeight: "10rem", minWidth: "10rem"}}>
-                <CardBody>
-                  <Placeholder as={CardTitle} animation="glow">
-                    <Placeholder xs={6} />
-                  </Placeholder>
-                  <Placeholder as={CardText} animation="glow">
-                    <Placeholder xs={7} /> <Placeholder xs={4} /> <Placeholder xs={4} />{' '}
-                    <Placeholder xs={6} /> <Placeholder xs={8} />
-                  </Placeholder>
-                </CardBody>
-              </Card>
+              [...Array(3)].map((e, i) => <span key={i}>
+                <Card style={{minHeight: "12rem", minWidth: "10rem"}}>
+                  <CardBody>
+                    <Placeholder as={CardTitle} animation="glow">
+                      <Placeholder xs={6} />
+                    </Placeholder>
+                    <Placeholder as={CardText} animation="glow">
+                      <Placeholder xs={7} /> <Placeholder xs={4} /> <Placeholder xs={4} />{' '}
+                      <Placeholder xs={6} /> <Placeholder xs={8} />
+                    </Placeholder>
+                  </CardBody>
+                </Card>
+              </span>)
             )}
           </div>
         </div>
@@ -237,16 +297,52 @@ function Dashboard(props){
         </Modal.Header>
         <Modal.Body>
           <div className="d-flex flex-column" style={{ gap: "10px" }}>
-            <Button variant="success" onClick={null}>Host</Button>
+            <Button
+              variant="success"
+              onClick={() => showConfirmation("Host Game", "Are you sure you want to host this game?", "success", () => {
+                // Trigger your host logic here
+              })}>Host</Button>
             <Button variant="secondary" onClick={null}>View Past Results</Button>
             <Link to={`/game/${selectedGame?.gameId}`}>
               <Button variant="primary" style={{ width: "100%" }} onClick={null}>Edit</Button>
             </Link>
-            <Button variant="danger" onClick={null}>Delete</Button>
+            <Button
+              variant="danger"
+              onClick={() =>
+                showConfirmation(
+                  "Delete Game",
+                  "Are you sure you want to delete this game?",
+                  "danger",
+                  () => deleteGame()
+                )
+              }
+            >
+              Delete
+            </Button>
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setSelectedGame(null)}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={confirmDialog.show} onHide={() => setConfirmDialog({ ...confirmDialog, show: false })} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{confirmDialog.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{confirmDialog.message}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setConfirmDialog({ ...confirmDialog, show: false })}>
+            Cancel
+          </Button>
+          <Button
+            variant={confirmDialog.variant}
+            onClick={() => {
+              confirmDialog.onConfirm();
+              setConfirmDialog({ ...confirmDialog, show: false });
+            }}
+          >
+            Confirm
+          </Button>
         </Modal.Footer>
       </Modal>
       <Fade in={showSuccessAlert}>
