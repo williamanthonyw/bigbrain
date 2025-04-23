@@ -72,7 +72,7 @@ function Dashboard(props){
       });
 
       const games = response.data.games;
-      const newGameId = generateId(Object.keys(games), 999999);
+      const newGameId = generateId(games.map(game => game.gameId), 999999);
       const newGame = {
         gameId: newGameId,
         owner: localStorage.getItem("email"),
