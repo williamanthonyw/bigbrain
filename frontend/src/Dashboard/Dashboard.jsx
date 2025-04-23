@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import brainImg from './assets/brain.png';
+import brainImg from '../assets/brain.png';
 import { Alert, Button, Card, CardBody, CardImg, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 
