@@ -9,7 +9,7 @@ import {
 
 import Home from './Home';
 import Login from "./Login";
-import Dashboard from "./Dashboard";
+import Dashboard from "./Dashboard/Dashboard";
 import Register from "./Register";
 import Play from "./Play";
 import Temp from "./Temp";
