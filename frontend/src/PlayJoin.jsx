@@ -14,7 +14,7 @@ function PlayJoin(){
 
   const joinSession = async () => {
     try{
-      const response = await axios.post(`http://localhost:5005/play/join/${sessionId}`, 
+      const response = await axios.post(`http://localhost:5005/play/join/${Number(sessionId)}`, 
         {
           name: playerName,
         }, {
@@ -23,11 +23,10 @@ function PlayJoin(){
             'Content-Type': 'application/json'
           }
         },);
-  
-      setPlayerId(response.data.playerId);
-      console.log(playerId);
+      const p = response.data.playerId;
       setShowModal(false);
-      navigate(`/play/${sessionId}/${playerId}`);
+      navigate(`/play/${sessionId}/${p}`);
+      console.log(p);
     }
 
     catch (err){
