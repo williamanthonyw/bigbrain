@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import brainImg from '../assets/brain.png';
-import { Alert, Button, Card, CardBody, CardImg, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
+import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 import { Link } from 'react-router-dom';
+import GameCard from './GameList';
 
 function Dashboard(props){
   const token = props.token;
@@ -164,8 +165,6 @@ function Dashboard(props){
         // hide modals
         setConfirmDialog({ ...confirmDialog, show: false });
         setSelectedGame(null);
-        // setShowSuccessAlert(true);
-        // setTimeout(() => setShowSuccessAlert(false), 3000);
         setGames(updatedGames);
       }
     }
@@ -177,12 +176,6 @@ function Dashboard(props){
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 5000);
     }
-  };
-
-  const getGameDuration = (game) => {
-    return game.questions.reduce(
-      (cumDuration, currentQuestion) => cumDuration + currentQuestion.duration, 0
-    )
   };
 
   const showConfirmation = (title, message, variant, onConfirm) => {
@@ -218,28 +211,14 @@ function Dashboard(props){
             {games !== null ? (
               // sort by most recently created
               games.sort((a, b) => b.dateCreated - a.dateCreated).map((game, index) => (
-                <Card
+                <GameCard
                   key={index}
+                  game={game}
                   onClick={() => setSelectedGame(game)}
                   onMouseEnter={() => setHoveredIndex(index)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  className="me-2"
-                  style={{
-                    cursor: "pointer",
-                    backgroundColor: hoveredIndex === index ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 1.0)',
-                    transition: 'background-color 0.3s',
-                    minHeight: "12rem",
-                    minWidth: "10rem",
-                    maxWidth: "10rem"}}>
-                  <CardImg variant="top" style={{maxHeight: "4rem"}} src={game.thumbnail} />
-                  <CardBody>
-                    <CardTitle>{game.title || `Game ${game.gameId}`}</CardTitle>
-                    <CardText>
-                      {game.questions.length} questions<br />
-                      {getGameDuration(game)} seconds
-                    </CardText>
-                  </CardBody>
-                </Card>
+                  isHovered={hoveredIndex === index}
+                />
               ))
             ) : (
               [...Array(3)].map((e, i) => <span key={i}>
