@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import brainImg from './assets/brain.png';
-import { Alert, Button, Fade, Form, FormControl, FormGroup, FormLabel, Modal } from "react-bootstrap";
+import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 
 function Dashboard(props){
   const token = props.token;
+  const [games, setGames] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newThumbnail, setNewThumbnail] = useState("");
   const [showNewGameModal, setShowNewGameModal] = useState(false);
@@ -12,6 +13,25 @@ function Dashboard(props){
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await axios.get('http://localhost:5005/admin/games', {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${props.token}`
+          }
+        });
+        console.log(response.data);
+        setGames(response.data.games);
+      }
+      catch (error){
+        console.error('Error fetching games: ', error);
+      }
+    };
+    fetchGames();
+  }, []);
 
   const openNewGameModal = () => {
     setShowNewGameModal(true);
@@ -76,7 +96,7 @@ function Dashboard(props){
       const newGame = {
         gameId: newGameId,
         owner: localStorage.getItem("email"),
-        name: newTitle,
+        title: newTitle,
         thumbnail: newThumbnail,
         questions: []
       };
@@ -94,6 +114,7 @@ function Dashboard(props){
         setShowNewGameModal(false);
         setShowSuccessAlert(true);
         setTimeout(() => setShowSuccessAlert(false), 3000);
+        setGames(updatedGames);
       }
     }
 
@@ -108,13 +129,47 @@ function Dashboard(props){
 
   return (
     <>
-      <div className="d-flex flex-column justify-content-center align-items-center vh-100" style={{ background: "linear-gradient(145deg, #2c2f33, #23272a" }}>
-        <img src={brainImg} alt="Brain Logo" className="mb-3" style={{ width: "80px", height: "80px" }} />
+      <div className="d-flex flex-column align-items-center vh-100" style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}>
+        <img src={brainImg} alt="Brain Logo" className="mt-2 mb-3" style={{ width: "80px", height: "80px" }} />
         <h1 className="mb-4 text-white">Dashboard</h1>
         <Button variant='danger' onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
-        <Button variant="primary" size="sm" onClick={openNewGameModal}>
-          Create new game ✏️
-        </Button>
+        <h2 className="mb-4 text-white">Active Game Sessions</h2>
+        <div className="container-fluid mb-5" style={{ overflowX: "auto"}}>
+          <div className="d-flex flex-row flex-nowrap">
+            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
+            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
+            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
+          </div>
+        </div>
+        <h2 className="mb-4 text-white">All Games</h2>
+        <div className="container-fluid" style={{ overflowX: "auto"}}>
+          <div className="d-flex flex-row flex-nowrap">
+            <Button variant="primary" className="me-2" style={{minHeight: "10rem", width: "10rem", minWidth: "10rem"}} onClick={openNewGameModal}>
+              Create new game ✏️
+            </Button>
+            {games !== null ? (
+              games.map((game, index) => (
+                <Card key={index} className="me-2" style={{minHeight: "10rem", minWidth: "10rem"}}>
+                  <CardBody>
+                    <CardTitle>{game.title || `Game ${game.gameId}`}</CardTitle>
+                  </CardBody>
+                </Card>
+              ))
+            ) : (
+              <Card style={{minHeight: "10rem", minWidth: "10rem"}}>
+                <CardBody>
+                  <Placeholder as={CardTitle} animation="glow">
+                    <Placeholder xs={6} />
+                  </Placeholder>
+                  <Placeholder as={CardText} animation="glow">
+                    <Placeholder xs={7} /> <Placeholder xs={4} /> <Placeholder xs={4} />{' '}
+                    <Placeholder xs={6} /> <Placeholder xs={8} />
+                  </Placeholder>
+                </CardBody>
+              </Card>
+            )}
+          </div>
+        </div>
       </div>
       <Modal show={showNewGameModal} onHide={closeNewGameModal} onExited={handleNewGameModalExited} centered>
         <Form noValidate validated={validated} onSubmit={createGame}>
