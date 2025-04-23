@@ -5,6 +5,7 @@ import { Alert, Button, Card, Fade, Modal } from "react-bootstrap";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
+import ConfirmDialogModal from "./ConfirmDialogModal";
 
 function Dashboard(props) {
   const token = props.token;
@@ -114,33 +115,10 @@ function Dashboard(props) {
         setErrorMessage={setErrorMessage}
         setShowErrorAlert={setShowErrorAlert}
       />
-      <Modal
-        show={confirmDialog.show}
-        onHide={() => setConfirmDialog({ ...confirmDialog, show: false })}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{confirmDialog.title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{confirmDialog.message}</Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setConfirmDialog({ ...confirmDialog, show: false })}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant={confirmDialog.variant}
-            onClick={() => {
-              confirmDialog.onConfirm();
-              setConfirmDialog({ ...confirmDialog, show: false });
-            }}
-          >
-            Confirm
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ConfirmDialogModal
+        confirmDialog={confirmDialog}
+        setConfirmDialog={setConfirmDialog}
+      />
       <Fade in={showSuccessAlert}>
         <div>
           <Alert

@@ -78,7 +78,7 @@ function GameOptionsModal({
                 "Are you sure you want to host this game?",
                 "success",
                 () => {
-                  // Trigger your host logic here
+                  // Trigger host logic here
                 }
               )
             }
