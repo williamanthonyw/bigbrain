@@ -45,94 +45,6 @@ function Dashboard(props) {
     fetchGames();
   }, []);
 
-  const openNewGameModal = () => {
-    setShowNewGameModal(true);
-  };
-
-  const closeNewGameModal = () => {
-    setShowNewGameModal(false);
-  };
-
-  const handleNewGameModalExited = () => {
-    setNewTitle("");
-    setNewThumbnail("");
-    setValidated(false);
-  };
-
-  // ID generation copied from backend/src/service.js
-  const randNum = (max) =>
-    Math.round(
-      Math.random() * (max - Math.floor(max / 10)) + Math.floor(max / 10)
-    );
-  const generateId = (currentList, max = 999999999) => {
-    let R = randNum(max);
-    while (currentList.includes(R)) {
-      R = randNum(max);
-    }
-    return R.toString();
-  };
-
-  const createGame = async (event) => {
-    const form = event.currentTarget;
-    event.preventDefault();
-    // block submission if input is invalid (eg name field is empty)
-    setValidated(true);
-    if (form.checkValidity() === false) {
-      event.stopPropagation();
-      return;
-    }
-    try {
-      // get full list of games, append new game then put
-      let response = await axios.get("http://localhost:5005/admin/games", {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const games = response.data.games;
-      const newGameId = generateId(
-        games.map((game) => game.gameId),
-        999999
-      );
-      const newGame = {
-        gameId: newGameId,
-        owner: localStorage.getItem("email"),
-        dateCreated: Date.now(),
-        title: newTitle,
-        thumbnail: newThumbnail,
-        questions: [],
-      };
-      const updatedGames = [...games, newGame];
-
-      response = await axios.put(
-        "http://localhost:5005/admin/games",
-        {
-          games: updatedGames,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setShowNewGameModal(false);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
-        setGames(updatedGames);
-      }
-    } catch (err) {
-      console.error("Error creating game: ", err);
-      const msg =
-        err.response?.data?.error || err.message || "Something went wrong :c";
-      setErrorMessage(msg);
-      setShowErrorAlert(true);
-      setTimeout(() => setShowErrorAlert(false), 5000);
-    }
-  };
-
   // delete game from delete dialog, use selectedGame dialog to check for match
   const deleteGame = async () => {
     try {
@@ -161,7 +73,6 @@ function Dashboard(props) {
         }
       );
       if (response.status === 200) {
-        setShowNewGameModal(false);
         // hide modals
         setConfirmDialog({ ...confirmDialog, show: false });
         setSelectedGame(null);
@@ -221,18 +132,28 @@ function Dashboard(props) {
           hoveredIndex={hoveredIndex}
           setHoveredIndex={setHoveredIndex}
           setSelectedGame={setSelectedGame}
-          openNewGameModal={openNewGameModal}
+          openNewGameModal={() => {
+            setShowNewGameModal(true);
+          }}
         />
       </div>
       <NewGameModal
+        token={token}
         show={showNewGameModal}
-        onHide={closeNewGameModal}
-        onExited={handleNewGameModalExited}
-        onSubmit={createGame}
+        onHide={() => {
+          setShowNewGameModal(false);
+        }}
+        newThumbnail={newThumbnail}
         setNewThumbnail={setNewThumbnail}
         validated={validated}
+        setValidated={setValidated}
         newTitle={newTitle}
         setNewTitle={setNewTitle}
+        setShowNewGameModal={setShowNewGameModal}
+        setGames={setGames}
+        setShowSuccessAlert={setShowSuccessAlert}
+        setShowErrorAlert={setShowErrorAlert}
+        setErrorMessage={setErrorMessage}
       />
       <GameOptionsModal
         selectedGame={selectedGame}
