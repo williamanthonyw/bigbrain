@@ -33,6 +33,7 @@ function Dashboard(props){
             Authorization: `Bearer ${props.token}`
           }
         });
+        console.log(token);
         console.log(response.data);
         setGames(response.data.games);
       }
