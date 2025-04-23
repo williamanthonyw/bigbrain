@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import brainImg from './assets/brain.png';
-import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
+import { Alert, Button, Card, CardBody, CardImg, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 
 function Dashboard(props){
   const token = props.token;
   const [games, setGames] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newThumbnail, setNewThumbnail] = useState("");
   const [showNewGameModal, setShowNewGameModal] = useState(false);
@@ -96,6 +98,7 @@ function Dashboard(props){
       const newGame = {
         gameId: newGameId,
         owner: localStorage.getItem("email"),
+        dateCreated: Date.now(),
         title: newTitle,
         thumbnail: newThumbnail,
         questions: []
@@ -127,6 +130,12 @@ function Dashboard(props){
     }
   };
 
+  const getGameDuration = (game) => {
+    return game.questions.reduce(
+      (cumDuration, currentQuestion) => cumDuration + currentQuestion.duration, 0
+    )
+  }
+
   return (
     <>
       <div className="d-flex flex-column align-items-center vh-100" style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}>
@@ -144,14 +153,32 @@ function Dashboard(props){
         <h2 className="mb-4 text-white">All Games</h2>
         <div className="container-fluid" style={{ overflowX: "auto"}}>
           <div className="d-flex flex-row flex-nowrap">
-            <Button variant="primary" className="me-2" style={{minHeight: "10rem", width: "10rem", minWidth: "10rem"}} onClick={openNewGameModal}>
+            <Button variant="primary" className="me-2" style={{minHeight: "12rem", width: "10rem", minWidth: "10rem"}} onClick={openNewGameModal}>
               Create new game ✏️
             </Button>
             {games !== null ? (
-              games.map((game, index) => (
-                <Card key={index} className="me-2" style={{minHeight: "10rem", minWidth: "10rem"}}>
+              // sort by most recently created
+              games.sort((a, b) => b.dateCreated - a.dateCreated).map((game, index) => (
+                <Card
+                  key={index}
+                  onClick={() => setSelectedGame(game)}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className="me-2"
+                  style={{
+                    cursor: "pointer",
+                    backgroundColor: hoveredIndex === index ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 1.0)',
+                    transition: 'background-color 0.3s',
+                    minHeight: "12rem",
+                    minWidth: "10rem",
+                    maxWidth: "10rem"}}>
+                  <CardImg variant="top" style={{maxHeight: "4rem"}} src={game.thumbnail} />
                   <CardBody>
                     <CardTitle>{game.title || `Game ${game.gameId}`}</CardTitle>
+                    <CardText>
+                      {game.questions.length} questions<br />
+                      {getGameDuration(game)} seconds
+                    </CardText>
                   </CardBody>
                 </Card>
               ))
@@ -202,6 +229,18 @@ function Dashboard(props){
             <Button variant="success" type="submit">Create</Button>
           </Modal.Footer>
         </Form>
+      </Modal>
+      <Modal show={selectedGame !== null} onHide={() => setSelectedGame(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.gameId}`}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p><strong>Game ID:</strong> {selectedGame?.gameId}</p>
+          <p><strong>Owner:</strong> {selectedGame?.owner}</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setSelectedGame(null)}>Close</Button>
+        </Modal.Footer>
       </Modal>
       <Fade in={showSuccessAlert}>
         <div>
