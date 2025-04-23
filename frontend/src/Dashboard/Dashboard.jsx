@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import brainImg from '../assets/brain.png';
-import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
+import { Alert, Button, Card, Fade, Modal} from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import GameList from './GameList';
+import NewGameModal from './NewGameModal';
 
 function Dashboard(props){
   const token = props.token;
@@ -57,19 +58,6 @@ function Dashboard(props){
     setNewThumbnail("");
     setValidated(false);
   }
-
-  const handleThumbnailFileChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-  
-    reader.onloadend = () => {
-      setNewThumbnail(reader.result); // base64 string as thumbnail
-    };
-  
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
 
   // ID generation copied from backend/src/service.js
   const randNum = (max) =>
@@ -211,38 +199,16 @@ function Dashboard(props){
           openNewGameModal={(openNewGameModal)}
         />
       </div>
-      <Modal show={showNewGameModal} onHide={closeNewGameModal} onExited={handleNewGameModalExited} centered>
-        <Form noValidate validated={validated} onSubmit={createGame}>
-          <Modal.Header closeButton>
-            <Modal.Title>Create new game ✏️</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <FormGroup>
-              <FormLabel>Name</FormLabel>
-              <FormControl
-                required
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="Enter a name for your game."
-              />
-              <div className="invalid-feedback">Please choose a name.</div>
-            </FormGroup>
-            <FormGroup>
-              <FormLabel>Thumbnail (optional)</FormLabel>
-              <FormControl
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailFileChange}
-              />
-            </FormGroup>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={closeNewGameModal}>Cancel</Button>
-            <Button variant="success" type="submit">Create</Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
+      <NewGameModal
+        show={showNewGameModal}
+        onHide={closeNewGameModal}
+        onExited={handleNewGameModalExited}
+        onSubmit={createGame}
+        setNewThumbnail={setNewThumbnail}
+        validated={validated}
+        newTitle={newTitle}
+        setNewTitle={setNewTitle}
+      />
       <Modal show={selectedGame !== null} onHide={() => setSelectedGame(null)} centered>
         <Modal.Header closeButton>
           <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.gameId}`}</Modal.Title>
