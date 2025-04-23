@@ -45,16 +45,17 @@ function AppRoutes({ token, setToken }) {
     try{
       await axios.post('http://localhost:5005/admin/auth/logout', {}, {
         headers: {
-          Authorization: `Bearer ${token}` 
+          Authorization: `Bearer ${token}`
         }
       });
-      setToken(null);        
-      navigate('/');   
+      setToken(null);
+      localStorage.removeItem("email");
+      navigate('/');
     }
     catch(err){
       alert(err.response?.data?.error || "Logout failed.");
     }
-          
+
   };
 
   return (
@@ -63,8 +64,8 @@ function AppRoutes({ token, setToken }) {
       <Route path="/play" element={<Play token={token} />} />
       <Route path="/login" element={<Login token={token} setfunction={setToken} />} />
       <Route path="/register" element={<Register token={token} setfunction={setToken} />} />
-      <Route path="/dashboard" element={<Dashboard logout={logout} />} />
-      <Route path="/temp" element={<Temp logout={logout} token={token} />} />
+      <Route path="/dashboard" element={<Dashboard token={token} logout={logout} />} />
+      <Route path="/temp" element={<Temp token={token} logout={logout} />} />
       <Route path="/game/:id" element={<GameDetails token={token} logout={logout}/>} />
       <Route path="/game/:gameId/question/:questionId" element={<QuestionDetails token={token} logout={logout}/>} />
     </Routes>

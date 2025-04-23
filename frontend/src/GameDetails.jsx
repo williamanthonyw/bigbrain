@@ -226,7 +226,7 @@ function GameDetails(props){
     console.log('clicked');
     console.log(props.token);
     if (props.token){
-      navigate('/temp');
+      navigate('/dashboard');
     }
   };
 
