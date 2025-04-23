@@ -3,7 +3,7 @@ import axios from 'axios';
 import brainImg from '../assets/brain.png';
 import { Alert, Button, Card, CardBody, CardText, CardTitle, Fade, Form, FormControl, FormGroup, FormLabel, Modal, Placeholder } from "react-bootstrap";
 import { Link } from 'react-router-dom';
-import GameCard from './GameList';
+import GameCard from './GameCard';
 
 function Dashboard(props){
   const token = props.token;
