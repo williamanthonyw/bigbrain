@@ -5,6 +5,7 @@ import { Alert, Button, Card, Fade, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
+import GameOptionsModal from "./GameOptionsModal";
 
 function Dashboard(props) {
   const token = props.token;
@@ -233,66 +234,12 @@ function Dashboard(props) {
         newTitle={newTitle}
         setNewTitle={setNewTitle}
       />
-      <Modal
-        show={selectedGame !== null}
-        onHide={() => setSelectedGame(null)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {selectedGame?.title || `Game ${selectedGame?.gameId}`}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="d-flex flex-column" style={{ gap: "10px" }}>
-            <Button
-              variant="success"
-              onClick={() =>
-                showConfirmation(
-                  "Host Game",
-                  "Are you sure you want to host this game?",
-                  "success",
-                  () => {
-                    // Trigger your host logic here
-                  }
-                )
-              }
-            >
-              Host
-            </Button>
-            <Button variant="secondary" onClick={null}>
-              View Past Results
-            </Button>
-            <Link to={`/game/${selectedGame?.gameId}`}>
-              <Button
-                variant="primary"
-                style={{ width: "100%" }}
-                onClick={null}
-              >
-                Edit
-              </Button>
-            </Link>
-            <Button
-              variant="danger"
-              onClick={() =>
-                showConfirmation(
-                  "Delete Game",
-                  "Are you sure you want to delete this game?",
-                  "danger",
-                  () => deleteGame()
-                )
-              }
-            >
-              Delete
-            </Button>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setSelectedGame(null)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <GameOptionsModal
+        selectedGame={selectedGame}
+        setSelectedGame={setSelectedGame}
+        showConfirmation={showConfirmation}
+        deleteGame={deleteGame}
+      />
       <Modal
         show={confirmDialog.show}
         onHide={() => setConfirmDialog({ ...confirmDialog, show: false })}
