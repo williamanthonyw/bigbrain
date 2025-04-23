@@ -1,6 +1,6 @@
 import { Container, Button} from "react-bootstrap";
 import brainImg from './assets/brain.png';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Home() {
 
@@ -26,7 +26,7 @@ function Home() {
         <Container className="text-center p-5 rounded shadow" style={{ maxWidth: '500px', backgroundColor: "#36393f", color: "white",}}>
           <Button variant="primary" type="submit" className="w-100" style={{ backgroundColor: "#7289da", border: "none" }} onClick={handleStartGame}>Start Game</Button>
         </Container>
-        <a href="/login" className="text-white mt-4" style={{ position: "absolute", bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" }}>Create your own game</a>
+        <Link to="/login" className="text-white mt-4" style={{ position: "absolute", bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" } }>Create your own game</Link>
       </div>
     </>
   );

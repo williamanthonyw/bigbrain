@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import brainImg from './assets/brain.png';
 
@@ -77,7 +77,7 @@ function Register(props) {
               <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="mb-3 form-input" required style={{ backgroundColor: "#2c2f33", border: "1px solid #7289da", color: "white" }}/>
             </Form.Group>
             <Button variant="primary" type="submit" className="w-100" style={{ backgroundColor: "#7289da", border: "none" }}> Register</Button>
-            <a href="/login" className="text-white mt-3 d-block" style={{ bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" }}>Existing user? log in here</a>
+            <Link to="/login" className="text-white mt-3 d-block" style={{ bottom: "20px", textDecoration: "underline", fontSize: "0.9rem" }}>Existing user? Log in here</Link>
           </Form>        
         </Container>
       </div>
