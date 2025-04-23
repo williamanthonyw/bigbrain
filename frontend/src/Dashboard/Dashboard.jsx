@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import brainImg from '../assets/brain.png';
-import { Alert, Button, Card, Fade, Modal} from "react-bootstrap";
-import { Link } from 'react-router-dom';
-import GameList from './GameList';
-import NewGameModal from './NewGameModal';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import brainImg from "../assets/brain.png";
+import { Alert, Button, Card, Fade, Modal } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import GameList from "./GameList";
+import NewGameModal from "./NewGameModal";
 
-function Dashboard(props){
+function Dashboard(props) {
   const token = props.token;
   const [games, setGames] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -15,7 +15,7 @@ function Dashboard(props){
     title: "",
     message: "",
     variant: "",
-    onConfirm: null
+    onConfirm: null,
   });
   const [selectedGame, setSelectedGame] = useState(null);
   const [newTitle, setNewTitle] = useState("");
@@ -29,17 +29,16 @@ function Dashboard(props){
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await axios.get('http://localhost:5005/admin/games', {
+        const response = await axios.get("http://localhost:5005/admin/games", {
           headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${props.token}`
-          }
+            Accept: "application/json",
+            Authorization: `Bearer ${props.token}`,
+          },
         });
         console.log(response.data);
         setGames(response.data.games);
-      }
-      catch (error){
-        console.error('Error fetching games: ', error);
+      } catch (error) {
+        console.error("Error fetching games: ", error);
       }
     };
     fetchGames();
@@ -57,7 +56,7 @@ function Dashboard(props){
     setNewTitle("");
     setNewThumbnail("");
     setValidated(false);
-  }
+  };
 
   // ID generation copied from backend/src/service.js
   const randNum = (max) =>
@@ -81,46 +80,52 @@ function Dashboard(props){
       event.stopPropagation();
       return;
     }
-    try{
+    try {
       // get full list of games, append new game then put
-      let response = await axios.get('http://localhost:5005/admin/games', {
+      let response = await axios.get("http://localhost:5005/admin/games", {
         headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        }
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const games = response.data.games;
-      const newGameId = generateId(games.map(game => game.gameId), 999999);
+      const newGameId = generateId(
+        games.map((game) => game.gameId),
+        999999
+      );
       const newGame = {
         gameId: newGameId,
         owner: localStorage.getItem("email"),
         dateCreated: Date.now(),
         title: newTitle,
         thumbnail: newThumbnail,
-        questions: []
+        questions: [],
       };
       const updatedGames = [...games, newGame];
 
-      response = await axios.put('http://localhost:5005/admin/games', {
-        games: updatedGames
-      }, {
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
+      response = await axios.put(
+        "http://localhost:5005/admin/games",
+        {
+          games: updatedGames,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      })
+      );
       if (response.status === 200) {
         setShowNewGameModal(false);
         setShowSuccessAlert(true);
         setTimeout(() => setShowSuccessAlert(false), 3000);
         setGames(updatedGames);
       }
-    }
-
-    catch (err){
+    } catch (err) {
       console.error("Error creating game: ", err);
-      const msg = err.response?.data?.error || err.message || "Something went wrong :c";
+      const msg =
+        err.response?.data?.error || err.message || "Something went wrong :c";
       setErrorMessage(msg);
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 5000);
@@ -129,25 +134,31 @@ function Dashboard(props){
 
   // delete game from delete dialog, use selectedGame dialog to check for match
   const deleteGame = async () => {
-    try{
+    try {
       // get full list of games, remove game then put
-      let response = await axios.get('http://localhost:5005/admin/games', {
+      let response = await axios.get("http://localhost:5005/admin/games", {
         headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        }
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      const updatedGames = games.filter((game) => game.gameId !== selectedGame.gameId);
+      const updatedGames = games.filter(
+        (game) => game.gameId !== selectedGame.gameId
+      );
 
-      response = await axios.put('http://localhost:5005/admin/games', {
-        games: updatedGames
-      }, {
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
+      response = await axios.put(
+        "http://localhost:5005/admin/games",
+        {
+          games: updatedGames,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      })
+      );
       if (response.status === 200) {
         setShowNewGameModal(false);
         // hide modals
@@ -155,11 +166,10 @@ function Dashboard(props){
         setSelectedGame(null);
         setGames(updatedGames);
       }
-    }
-
-    catch (err){
+    } catch (err) {
       console.error("Error creating game: ", err);
-      const msg = err.response?.data?.error || err.message || "Something went wrong :c";
+      const msg =
+        err.response?.data?.error || err.message || "Something went wrong :c";
       setErrorMessage(msg);
       setShowErrorAlert(true);
       setTimeout(() => setShowErrorAlert(false), 5000);
@@ -172,22 +182,36 @@ function Dashboard(props){
       title,
       message,
       variant,
-      onConfirm
+      onConfirm,
     });
   };
 
   return (
     <>
-      <div className="d-flex flex-column align-items-center vh-100" style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}>
-        <img src={brainImg} alt="Brain Logo" className="mt-2 mb-3" style={{ width: "80px", height: "80px" }} />
+      <div
+        className="d-flex flex-column align-items-center vh-100"
+        style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}
+      >
+        <img
+          src={brainImg}
+          alt="Brain Logo"
+          className="mt-2 mb-3"
+          style={{ width: "80px", height: "80px" }}
+        />
         <h1 className="mb-4 text-white">Dashboard</h1>
-        <Button variant='danger' onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
+        <Button
+          variant="danger"
+          onClick={props.logout}
+          style={{ position: "absolute", top: "20px", right: "20px" }}
+        >
+          Logout
+        </Button>
         <h2 className="mb-4 text-white">Active Game Sessions</h2>
-        <div className="container-fluid mb-5" style={{ overflowX: "auto"}}>
+        <div className="container-fluid mb-5" style={{ overflowX: "auto" }}>
           <div className="d-flex flex-row flex-nowrap">
-            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
-            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
-            <Card style={{minHeight: "10rem", minWidth: "10rem"}}>Hi</Card>
+            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
+            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
+            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
           </div>
         </div>
         <h2 className="mb-4 text-white">All Games</h2>
@@ -196,7 +220,7 @@ function Dashboard(props){
           hoveredIndex={hoveredIndex}
           setHoveredIndex={setHoveredIndex}
           setSelectedGame={setSelectedGame}
-          openNewGameModal={(openNewGameModal)}
+          openNewGameModal={openNewGameModal}
         />
       </div>
       <NewGameModal
@@ -209,20 +233,44 @@ function Dashboard(props){
         newTitle={newTitle}
         setNewTitle={setNewTitle}
       />
-      <Modal show={selectedGame !== null} onHide={() => setSelectedGame(null)} centered>
+      <Modal
+        show={selectedGame !== null}
+        onHide={() => setSelectedGame(null)}
+        centered
+      >
         <Modal.Header closeButton>
-          <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.gameId}`}</Modal.Title>
+          <Modal.Title>
+            {selectedGame?.title || `Game ${selectedGame?.gameId}`}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="d-flex flex-column" style={{ gap: "10px" }}>
             <Button
               variant="success"
-              onClick={() => showConfirmation("Host Game", "Are you sure you want to host this game?", "success", () => {
-                // Trigger your host logic here
-              })}>Host</Button>
-            <Button variant="secondary" onClick={null}>View Past Results</Button>
+              onClick={() =>
+                showConfirmation(
+                  "Host Game",
+                  "Are you sure you want to host this game?",
+                  "success",
+                  () => {
+                    // Trigger your host logic here
+                  }
+                )
+              }
+            >
+              Host
+            </Button>
+            <Button variant="secondary" onClick={null}>
+              View Past Results
+            </Button>
             <Link to={`/game/${selectedGame?.gameId}`}>
-              <Button variant="primary" style={{ width: "100%" }} onClick={null}>Edit</Button>
+              <Button
+                variant="primary"
+                style={{ width: "100%" }}
+                onClick={null}
+              >
+                Edit
+              </Button>
             </Link>
             <Button
               variant="danger"
@@ -240,16 +288,25 @@ function Dashboard(props){
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setSelectedGame(null)}>Close</Button>
+          <Button variant="secondary" onClick={() => setSelectedGame(null)}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
-      <Modal show={confirmDialog.show} onHide={() => setConfirmDialog({ ...confirmDialog, show: false })} centered>
+      <Modal
+        show={confirmDialog.show}
+        onHide={() => setConfirmDialog({ ...confirmDialog, show: false })}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>{confirmDialog.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{confirmDialog.message}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setConfirmDialog({ ...confirmDialog, show: false })}>
+          <Button
+            variant="secondary"
+            onClick={() => setConfirmDialog({ ...confirmDialog, show: false })}
+          >
             Cancel
           </Button>
           <Button
@@ -291,7 +348,6 @@ function Dashboard(props){
       </Fade>
     </>
   );
-  
 }
 
-export default Dashboard
+export default Dashboard;
