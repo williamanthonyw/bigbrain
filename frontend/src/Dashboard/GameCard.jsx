@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Card, CardImg, CardBody, CardTitle, CardText } from "react-bootstrap";
 
-function GameCard({ game, onClick, onMouseEnter, onMouseLeave, isHovered }) {
+function GameCard({ game, onClick }) {
+  const [hovered, setHovered] = useState(false);
+
   const getGameDuration = (game) => {
     return game.questions.reduce(
       (cumDuration, currentQuestion) => cumDuration + currentQuestion.duration,
@@ -11,12 +14,12 @@ function GameCard({ game, onClick, onMouseEnter, onMouseLeave, isHovered }) {
   return (
     <Card
       onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       className="me-2"
       style={{
         cursor: "pointer",
-        backgroundColor: isHovered
+        backgroundColor: hovered
           ? "rgba(255, 255, 255, 0.8)"
           : "rgba(255, 255, 255, 1.0)",
         transition: "background-color 0.3s",

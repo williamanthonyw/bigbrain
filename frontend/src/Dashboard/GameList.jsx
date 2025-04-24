@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Button,
   Card,
@@ -10,7 +9,6 @@ import {
 import GameCard from "./GameCard";
 
 function GameList({ games, setSelectedGame, openNewGameModal }) {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
     <div className="container-fluid" style={{ overflowX: "auto" }}>
@@ -31,9 +29,6 @@ function GameList({ games, setSelectedGame, openNewGameModal }) {
                 key={index}
                 game={game}
                 onClick={() => setSelectedGame(game)}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                isHovered={hoveredIndex === index}
               />
             ))
           : [...Array(3)].map((e, i) => (
