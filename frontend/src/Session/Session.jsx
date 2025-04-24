@@ -8,7 +8,6 @@ import {
   SiteLogo,
 } from "../CommonComponents";
 import SessionLobby from "./SessionLobby";
-import SessionInProgress from "./SessionInProgress";
 import SessionResults from "./SessionResults";
 
 function Session(props) {
