@@ -136,7 +136,7 @@ function SessionOptionsModal({
               </OverlayTrigger>
             </InputGroup>
           </FormGroup>
-          {sessionStatus.active ? (
+          {sessionStatus !== null && sessionStatus.active ? (
             <>
               <Link to={`/session/${selectedGame?.active}`}>
                 <Button variant="primary" style={{ width: "100%" }}>
