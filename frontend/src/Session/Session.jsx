@@ -13,6 +13,7 @@ import SessionResults from "./SessionResults";
 
 function Session(props) {
   const { sessionId } = useParams();
+  const [game, setGame] = useState(null);
   const [sessionStatus, setSessionStatus] = useState(null);
 
   const fetchStatus = async () => {
@@ -33,9 +34,33 @@ function Session(props) {
     }
   };
 
+  const getGamefromSessionId = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5005/admin/games`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${props.token}`,
+        },
+      });
+      const games = response.data.games;
+      // Find the game with the matching sessionId
+      let game = games.find((game) => game.active == sessionId);
+      // If not found, check oldSessions
+      if (!game) {
+        const oldSessions = games.flatMap((game) => game.oldSessions);
+        game = oldSessions.find((oldSession) => oldSession == sessionId);
+      }
+      setGame(game);
+    } catch (error) {
+      console.error("Error fetching game ID:", error);
+    }
+  };
+
   // run once on load
   useEffect(() => {
     if (sessionId) fetchStatus();
+    setGame(getGamefromSessionId());
   }, [sessionId]);
 
   // check for new players every second while in lobby
@@ -61,11 +86,12 @@ function Session(props) {
       <LogoutButton onClick={props.logout} />
       <h1>Session {sessionId}</h1>
       {sessionStatus.active === true ? (
-        sessionStatus.position === -1 ? (
-          <SessionLobby sessionStatus={sessionStatus} />
-        ) : (
-          <SessionInProgress sessionStatus={sessionStatus} />
-        )
+        <SessionLobby
+          token={props.token}
+          game={game}
+          sessionStatus={sessionStatus}
+          setSessionStatus={setSessionStatus}
+        />
       ) : (
         <SessionResults sessionStatus={sessionStatus} />
       )}
