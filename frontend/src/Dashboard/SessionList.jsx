@@ -8,7 +8,7 @@ function SessionList({ games, onClick }) {
       <div className="d-flex flex-row flex-nowrap">
         {games !== null // sort by most recently created
           ? games
-            .filter((game) => game.active !== null)
+            .filter((game) => game.active && game.active !== null)
             .sort((a, b) => b.dateCreated - a.dateCreated)
             .map((game, index) => (
               <SessionCard

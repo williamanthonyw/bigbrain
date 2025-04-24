@@ -30,18 +30,15 @@ function GameOptionsModal({
         }
       );
       if (response.status === 200) {
-        const { status, sessionId } = response.data;
-        setConfirmDialog({
-          ...confirmDialog,
-          show: true,
-          title: "Game Hosted",
-          message: `Game ${selectedGame.title} is hosted at ${sessionId}`,
-          variant: "success",
-          onConfirm: () => {
-            setConfirmDialog({ ...confirmDialog, show: false });
-            setSelectedGame(null);
-          },
-        });
+        const { sessionId } = response.data.data;
+        // update the game list with the new sessionId
+        setGames(
+          games.map((g) =>
+            g.gameId === selectedGame.gameId ? { ...g, active: sessionId } : g
+          )
+        );
+        setSelectedGame(null);
+        // TODO: show custom modal for showing session URL
       }
     } catch (err) {
       console.error("Error hosting game: ", err);

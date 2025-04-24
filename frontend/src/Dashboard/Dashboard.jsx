@@ -64,9 +64,9 @@ function Dashboard(props) {
         >
           Logout
         </Button>
-        <h2 className="mb-4 text-white">Active Game Sessions</h2>
+        <h2 className="mb-3 text-white">Active Game Sessions</h2>
         <SessionList games={games} onClick={null} />
-        <h2 className="mt-5 mb-4 text-white">All Games</h2>
+        <h2 className="mt-4 mb-3 text-white">All Games</h2>
         <GameList
           games={games}
           setSelectedGame={setSelectedGame}
