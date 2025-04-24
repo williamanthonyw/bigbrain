@@ -16,6 +16,8 @@ import Temp from "./Temp";
 import GameDetails from "./GameDetails";
 import QuestionDetails from "./QuestionDetails";
 import Session from "./Session/Session";
+import PlayJoin from "./PlayJoin";
+import PlayGame from "./PlayGame";
 
 function App() {
 
@@ -70,6 +72,8 @@ function AppRoutes({ token, setToken }) {
       <Route path="/game/:id" element={<GameDetails token={token} logout={logout}/>} />
       <Route path="/game/:gameId/question/:questionId" element={<QuestionDetails token={token} logout={logout}/>} />
       <Route path="/session/:sessionId" element={<Session token={token} logout={logout}/>} />
+      <Route path="/play/:sessionId/:playerId" element={<PlayGame />} />
+      <Route path="/play/:sessionId" element={<PlayJoin />} />
     </Routes>
   );
 };
