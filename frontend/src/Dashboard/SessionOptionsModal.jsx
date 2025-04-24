@@ -25,6 +25,69 @@ function SessionOptionsModal({ selectedSession, setSelectedSession }) {
     }
   };
 
+  useEffect(() => {
+    const getSessionStatus = async () => {
+      if (!selectedGame?.active) return;
+      try {
+        const response = await axios.get(
+          `http://localhost:5005/admin/session/${selectedGame?.active}/status`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.status === 200) {
+          setSessionStatus(response.data.results);
+          console.log(sessionStatus);
+        }
+      } catch (err) {
+        console.error("Error fetching session status: ", err);
+        const msg =
+          err.response?.data?.error || err.message || "Something went wrong :c";
+        setErrorMessage(msg);
+        setShowErrorAlert(true);
+        setTimeout(() => setShowErrorAlert(false), 5000);
+      }
+    };
+    getSessionStatus();
+  }, [selectedGame]);
+
+  const endGame = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5005/admin/game/${selectedGame.gameId}/mutate`,
+        {
+          mutationType: "END",
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const { status } = response.data.data;
+        // update the game list with the new sessionId
+        setGames(
+          games.map((g) =>
+            g.gameId === selectedGame.gameId ? { ...g, active: null } : g
+          )
+        );
+        setSessionStatus({ sessionStatus, active: false });
+      }
+    } catch (err) {
+      console.error("Error hosting game: ", err);
+      const msg =
+        err.response?.data?.error || err.message || "Something went wrong :c";
+      setErrorMessage(msg);
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 5000);
+    }
+  };
+
   return (
     <Modal
       show={selectedSession !== null}
