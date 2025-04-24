@@ -14,6 +14,45 @@ function GameOptionsModal({
   setErrorMessage,
   setShowErrorAlert,
 }) {
+  // host a game session then open modal with game URL
+  const hostGame = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5005/admin/game/${selectedGame.gameId}/mutate`,
+        {
+          mutationType: "START",
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const { status, sessionId } = response.data;
+        setConfirmDialog({
+          ...confirmDialog,
+          show: true,
+          title: "Game Hosted",
+          message: `Game ${selectedGame.title} is hosted at ${sessionId}`,
+          variant: "success",
+          onConfirm: () => {
+            setConfirmDialog({ ...confirmDialog, show: false });
+            setSelectedGame(null);
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Error hosting game: ", err);
+      const msg =
+        err.response?.data?.error || err.message || "Something went wrong :c";
+      setErrorMessage(msg);
+      setShowErrorAlert(true);
+      setTimeout(() => setShowErrorAlert(false), 5000);
+    }
+  };
+
   // delete game from delete dialog, use selectedGame dialog to check for match
   const deleteGame = async () => {
     try {

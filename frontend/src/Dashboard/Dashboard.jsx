@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Alert, Button, Card, Fade } from "react-bootstrap";
+import { Alert, Button, Fade } from "react-bootstrap";
 import { BackgroundWrapper, SiteLogo } from "../CommonComponents";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
 import ConfirmDialogModal from "./ConfirmDialogModal";
+import SessionList from "./SessionList";
 
 function Dashboard(props) {
   const token = props.token;
@@ -64,14 +65,8 @@ function Dashboard(props) {
           Logout
         </Button>
         <h2 className="mb-4 text-white">Active Game Sessions</h2>
-        <div className="container-fluid mb-5" style={{ overflowX: "auto" }}>
-          <div className="d-flex flex-row flex-nowrap">
-            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
-            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
-            <Card style={{ minHeight: "10rem", minWidth: "10rem" }}>Hi</Card>
-          </div>
-        </div>
-        <h2 className="mb-4 text-white">All Games</h2>
+        <SessionList games={games} onClick={null} />
+        <h2 className="mt-5 mb-4 text-white">All Games</h2>
         <GameList
           games={games}
           setSelectedGame={setSelectedGame}
@@ -136,6 +131,6 @@ function Dashboard(props) {
       </Fade>
     </>
   );
-};
+}
 
 export default Dashboard;
