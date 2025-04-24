@@ -108,19 +108,36 @@ function GameOptionsModal({
       </Modal.Header>
       <Modal.Body>
         <div className="d-flex flex-column" style={{ gap: "10px" }}>
-          <Button
-            variant="success"
-            onClick={() =>
-              showConfirmation(
-                "Start Game",
-                "Are you sure you want to start this game?",
-                "success",
-                hostGame
-              )
-            }
-          >
-            Start Game
-          </Button>
+          {
+            // disable start game button if game is already active
+            selectedGame?.active && selectedGame?.active !== null ? (
+              <>
+                <Button
+                  disabled
+                  variant="success"
+                >
+                  Game already active
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="success"
+                  onClick={() =>
+                    showConfirmation(
+                      "Start Game",
+                      "Are you sure you want to start this game?",
+                      "success",
+                      hostGame
+                    )
+                  }
+                >
+                  Start Game
+                </Button>
+              </>
+            )
+          }
+
           <Button variant="secondary" onClick={null}>
             View Past Results
           </Button>
