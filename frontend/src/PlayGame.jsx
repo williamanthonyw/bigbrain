@@ -97,7 +97,7 @@ function FunFact() {
   );
 }
 
-function WaitingDotsText() {
+function WaitingDotsText({ text }) {
   const [dotCount, setDotCount] = useState(0);
 
   useEffect(() => {
@@ -109,7 +109,7 @@ function WaitingDotsText() {
 
   return (
     <div style={{ fontSize: "1.5rem" }}>
-      Waiting for host to start<span>{".".repeat(dotCount)}</span>
+      {text}<span>{".".repeat(dotCount)}</span>
     </div>
   );
 }
@@ -139,8 +139,9 @@ function PlayGame(){
   const { sessionId, playerId } = useParams();
   const [gameStarted, setGameStarted] = useState(false);
   const [question, setQuestion] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(null);
   const [userAnswers, setUserAnswers] = useState([]);
+  const [correctAnswers, setCorrectAnswers] = useState([]);
 
   const handleUserAnswer = async (index) => {
     let updatedAnswers = [];
@@ -154,7 +155,6 @@ function PlayGame(){
         : [...userAnswers, index];
       setUserAnswers(updatedAnswers);
     }
-    console.log(updatedAnswers);
     try{
       await axios.put(`http://localhost:5005/play/${Number(playerId)}/answer`, {
         answers: updatedAnswers
@@ -175,36 +175,45 @@ function PlayGame(){
   };
 
   useEffect(() => {
-    const fetchQuestionDetails = async () => {
-      try{
-        const response = await axios.get(`http://localhost:5005/play/${playerId}/question`, {
-          headers: {
-            Accept: 'application/json'
-          }
-        });
-
-        const data = response.data.question;
-        console.log(data);
-
-        setQuestion(data);
-        setTimeRemaining(data.duration);
-      }
-      catch(err){
-        console.error('Error fetching question details', err);
-      }
-    };
-    fetchQuestionDetails();
-  }, [playerId]);
+    if (!gameStarted || timeRemaining > 0) return;
   
-  // useEffect(() => {
-  //   if (!timeRemaining) return;
+    const interval = setInterval(async () => {
+      try {
+        const response = await axios.get(`http://localhost:5005/play/${playerId}/question`, {
+          headers: { Accept: 'application/json' }
+        });
+  
+        const newQuestion = response.data.question;
+  
+        if (!question || newQuestion.id !== question.id) {
+          setQuestion(newQuestion);
+          setTimeRemaining(newQuestion.duration);
+          setUserAnswers([]);
+          setCorrectAnswers([]);
+        }
+      } catch (err) {
+        console.error('Error polling for next question:', err);
+      }
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [gameStarted, timeRemaining, question, playerId]);
 
-  //   const timer = setInterval(() => {
-  //     setTimeRemaining((prev) => (prev > 0) ? prev - 1 : 0);
-  //   }, 1000);
+  useEffect(() => {
+    if (!gameStarted || timeRemaining <= 0) return;
 
-  //   return () => clearInterval(timer);
-  // }, [timeRemaining]);
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => (prev > 0) ? prev - 1 : 0);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, timeRemaining]);
+
+  useEffect(() => {
+    if (timeRemaining === 0) {
+      clearInterval();
+    }
+  }, [timeRemaining]);
 
   useEffect(() => {
     const checkGameStatus = async () => {
@@ -225,6 +234,32 @@ function PlayGame(){
     const interval = setInterval(checkGameStatus, 1000);
     return () => clearInterval(interval);
   }, [playerId]);
+
+  useEffect(() => {
+    if (!gameStarted || timeRemaining !== 0 || !playerId) return;
+
+    if (timeRemaining === 0){
+      const fetchCorrectAnswers = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5005/play/${Number(playerId)}/answer`, {
+            headers: {
+              Accept: 'application/json'
+            }
+          });
+
+          console.log(response);
+
+          setCorrectAnswers(response.data.answers);
+
+        }
+        catch (err){
+          console.error("Error fetching correct answers", err);
+        }
+      } 
+      fetchCorrectAnswers();
+    }
+     
+  }, [gameStarted, timeRemaining, playerId]);
 
   return(
     
@@ -250,110 +285,138 @@ function PlayGame(){
         `}
       </style>
       <div className="d-flex justify-content-center align-items-center flex-column" style={{  background: "linear-gradient(145deg, #2c2f33, #23272a)", color: "white", minHeight: "100vh", textAlign: 'center', padding: "2rem", position: 'relative'}}>
-        { gameStarted ? (
-          <>
-            <h1 className="mb-5" style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'relative', top: "30px"}}>{question.title}</h1>
-            <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining}</div>
-            
-            <div className="mt-5 mb-4 text-center"
-              style={{ 
-                width: '400px',
-                height: '300px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                position: 'relative'
-              }}>
-              {question.media ? (
-                isYouTubeUrl(question.media) ? ( 
-                  <iframe
-                    src={getYouTubeEmbedUrl(question.media)}
-                    title="YouTube video"
-                    allowFullScreen
-                    style={{ width: '100%', height: '100%', border: 'none' }}
-                  />
+        { gameStarted && question && question.answers? (
+          timeRemaining > 0 ? (
+            <>
+              <h1 className="mb-5" style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'relative', top: "30px"}}>{question.title}</h1>
+              <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining}</div>
+              
+              <div className="mt-5 mb-4 text-center"
+                style={{ 
+                  width: '400px',
+                  height: '300px',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  position: 'relative'
+                }}>
+                {question.media ? (
+                  isYouTubeUrl(question.media) ? ( 
+                    <iframe
+                      src={getYouTubeEmbedUrl(question.media)}
+                      title="YouTube video"
+                      allowFullScreen
+                      style={{ width: '100%', height: '100%', border: 'none' }}
+                    />
 
+                  ) : (
+                    <img
+                      src={question.media}
+                      alt="Media"
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+                  )
                 ) : (
-                  <img
-                    src={question.media}
-                    alt="Media"
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
-                )
-              ) : (
-                <div
-                  className="d-flex justify-content-center align-items-center"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: '#23272a',
-                  }}
-                >
-                  <i className="bi bi-image" style={{ fontSize: '3rem', color: '#666' }}></i>
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: '#23272a',
+                    }}
+                  >
+                    <i className="bi bi-image" style={{ fontSize: '3rem', color: '#666' }}></i>
+                  </div>
+                )}
+              </div>
+              
+              {(question.type === 'single' || question.type === 'multiple') && (
+                <div className="mb-5">
+                  <Form.Label className="text-white mb-4">
+                    {question.type === 'single' ? 'Choose One' : 'Choose One or More'}
+                  </Form.Label>
+                  {question.answers.map((answer, index) => (
+                    <div key={index} className="d-flex align-items-center mb-4">
+                      <Form.Check
+                        type={question.type === 'single' ? 'radio' : 'checkbox'}
+                        name="userAnswer"
+                        checked={question.type.includes(index)}
+                        onChange={() => handleUserAnswer(index)}
+                        className="me-2"
+                      />
+                      <Form.Control
+                        type="text"
+                        value={answer}
+                        disabled
+                        className="bg-dark text-white border-secondary"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
-            </div>
-            
-            {(question.type === 'single' || question.type === 'multiple') && (
-              <div className="mb-5">
-                <Form.Label className="text-white mb-4">
-                  {question.type === 'single' ? 'Choose One' : 'Choose One or More'}
-                </Form.Label>
-                {question.answers.map((answer, index) => (
-                  <div key={index} className="d-flex align-items-center mb-4">
+
+              {question.type === 'judgement' && (
+                <div className="mt-5">
+                  <Form.Label className="text-white mb-4">Select True or False</Form.Label>
+                  <div className="d-flex align-items-center mb-3">
                     <Form.Check
-                      type={question.type === 'single' ? 'radio' : 'checkbox'}
+                      type="radio"
                       name="userAnswer"
-                      checked={question.type.includes(index)}
-                      onChange={() => handleUserAnswer(index)}
+                      checked={userAnswers.includes(0)}
+                      onChange={() => handleUserAnswer(0)}
                       className="me-2"
                     />
                     <Form.Control
                       type="text"
-                      value={answer}
+                      value="True"
                       disabled
                       className="bg-dark text-white border-secondary"
                     />
                   </div>
-                ))}
-              </div>
-            )}
-
-            {question.type === 'judgement' && (
+                  <div className="d-flex align-items-center mb-3">
+                    <Form.Check
+                      type="radio"
+                      name="userAnswer"
+                      checked={userAnswers.includes(1)}
+                      onChange={() => handleUserAnswer(1)}
+                      className="me-2"
+                    />
+                    <Form.Control
+                      type="text"
+                      value="False"
+                      disabled
+                      className="bg-dark text-white border-secondary"
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
               <div className="mt-5">
-                <Form.Label className="text-white mb-4">Select True or False</Form.Label>
-                <div className="d-flex align-items-center mb-3">
-                  <Form.Check
-                    type="radio"
-                    name="userAnswer"
-                    checked={userAnswers.includes(0)}
-                    onChange={() => handleUserAnswer(0)}
-                    className="me-2"
-                  />
-                  <Form.Control
-                    type="text"
-                    value="True"
-                    disabled
-                    className="bg-dark text-white border-secondary"
-                  />
-                </div>
-                <div className="d-flex align-items-center mb-3">
-                  <Form.Check
-                    type="radio"
-                    name="userAnswer"
-                    checked={userAnswers.includes(1)}
-                    onChange={() => handleUserAnswer(1)}
-                    className="me-2"
-                  />
-                  <Form.Control
-                    type="text"
-                    value="False"
-                    disabled
-                    className="bg-dark text-white border-secondary"
-                  />
-                </div>
+                <Form.Label className="text-white mb-4">Answers</Form.Label>
+                { question.answers.map((answer, index) => {
+                  const isCorrect = correctAnswers.includes(index);
+                  const userChosen = userAnswers.includes(index);
+                  const isWrong = userChosen && !isCorrect;
+                  
+                  return (
+                    <div key={index} className="d-flex align-items-center mb-3">
+                      <Form.Check type="checkbox" checked={userChosen} disabled className="me-2"/>
+                      <Form.Control type="text" value={answer} disabled className="bg-dark text-white border-secondary me-2"/>
+                      { isCorrect && (
+                        <span style={{ color: 'limegreen', fontSize: '1.5rem' }}>✓</span>
+                      )}
+                      { isWrong && (
+                        <span style={{ color: 'red', fontSize: '1.5rem' }}>✗</span>
+                      )}
+                    </div>
+                  )
+                })}
+                <WaitingDotsText text="Waiting for host to advance"/>
               </div>
-            )}
-              
-          </>
+
+            </>
+          )
+         
         ) : (
           <>
             <h1 style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'absolute', top: "30px", left: '50%', transform: "translateX(-50%)"}}>Lobby</h1>
@@ -362,7 +425,7 @@ function PlayGame(){
                 <div style={{ boxSizing: "border-box",position: "absolute",width: "100%",height: "100%",border: "5px solid #7289da",borderTopColor: "transparent",borderRadius: "50%",animation: "spin 2s linear infinite" }}/>
                 <div style={{ boxSizing: "border-box", position: "absolute",width: "100%",height: "100%",border: "5px solid #99aab5",borderBottomColor: "transparent",borderRadius: "50%",animation: "spin-rev 3s linear infinite" }}/>
               </div>
-              <WaitingDotsText/>
+              <WaitingDotsText text="Waiting for host to start"/>
               <FunFact/>
             </div>
           </>

@@ -234,7 +234,7 @@ function Dashboard(props){
                     maxWidth: "10rem"}}>
                   <CardImg variant="top" style={{maxHeight: "4rem"}} src={game.thumbnail} />
                   <CardBody>
-                    <CardTitle>{game.title || `Game ${game.gameId}`}</CardTitle>
+                    <CardTitle>{game.title || `Game ${game.id}`}</CardTitle>
                     <CardText>
                       {game.questions.length} questions<br />
                       {getGameDuration(game)} seconds
@@ -294,7 +294,7 @@ function Dashboard(props){
       </Modal>
       <Modal show={selectedGame !== null} onHide={() => setSelectedGame(null)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.gameId}`}</Modal.Title>
+          <Modal.Title>{selectedGame?.title || `Game ${selectedGame?.id}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="d-flex flex-column" style={{ gap: "10px" }}>
@@ -303,8 +303,9 @@ function Dashboard(props){
               onClick={() => showConfirmation("Host Game", "Are you sure you want to host this game?", "success", () => {
                 // Trigger your host logic here
               })}>Host</Button>
+            {console.log(selectedGame)}
             <Button variant="secondary" onClick={null}>View Past Results</Button>
-            <Link to={`/game/${selectedGame?.gameId}`}>
+            <Link to={`/game/${selectedGame?.id}`}>
               <Button variant="primary" style={{ width: "100%" }} onClick={null}>Edit</Button>
             </Link>
             <Button
