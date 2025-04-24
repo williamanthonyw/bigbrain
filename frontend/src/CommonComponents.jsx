@@ -1,3 +1,5 @@
+import brainImg from "./assets/brain.png";
+
 const BackgroundWrapper = ({ children }) => {
   return (
     <div
@@ -9,4 +11,14 @@ const BackgroundWrapper = ({ children }) => {
   );
 };
 
-export default BackgroundWrapper;
+const SiteLogo = () => {
+  return (
+    <img
+      src={brainImg}
+      alt="Brain Logo"
+      style={{ width: "80px", height: "80px" }}
+    />
+  );
+};
+
+export { BackgroundWrapper, SiteLogo };

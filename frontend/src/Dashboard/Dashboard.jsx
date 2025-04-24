@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import brainImg from "../assets/brain.png";
 import { Alert, Button, Card, Fade } from "react-bootstrap";
-import BackgroundWrapper from "../CommonComponents";
+import { BackgroundWrapper, SiteLogo } from "../CommonComponents";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
@@ -55,12 +54,7 @@ function Dashboard(props) {
   return (
     <>
       <BackgroundWrapper>
-        <img
-          src={brainImg}
-          alt="Brain Logo"
-          className="mt-2 mb-3"
-          style={{ width: "80px", height: "80px" }}
-        />
+        <SiteLogo className="mt-2 mb-3" />
         <h1 className="mb-4 text-white">Dashboard</h1>
         <Button
           variant="danger"
@@ -142,6 +136,6 @@ function Dashboard(props) {
       </Fade>
     </>
   );
-}
+};
 
 export default Dashboard;
