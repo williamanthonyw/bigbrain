@@ -8,6 +8,7 @@ function GameOptionsModal({
   setGames,
   selectedGame,
   setSelectedGame,
+  setSelectedSession,
   showConfirmation,
   confirmDialog,
   setConfirmDialog,
@@ -38,6 +39,7 @@ function GameOptionsModal({
           )
         );
         setSelectedGame(null);
+        setSelectedSession(selectedGame);
         // TODO: show custom modal for showing session URL
       }
     } catch (err) {

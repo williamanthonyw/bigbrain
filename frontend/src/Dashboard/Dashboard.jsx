@@ -7,6 +7,7 @@ import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
 import ConfirmDialogModal from "./ConfirmDialogModal";
 import SessionList from "./SessionList";
+import SessionOptionsModal from "./SessionOptionsModal";
 
 function Dashboard(props) {
   const token = props.token;
@@ -19,6 +20,7 @@ function Dashboard(props) {
     onConfirm: null,
   });
   const [selectedGame, setSelectedGame] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -65,16 +67,20 @@ function Dashboard(props) {
           Logout
         </Button>
         <h2 className="mb-3 text-white">Active Game Sessions</h2>
-        <SessionList games={games} onClick={null} />
+        <SessionList games={games} onClick={setSelectedSession} />
         <h2 className="mt-4 mb-3 text-white">All Games</h2>
         <GameList
           games={games}
-          setSelectedGame={setSelectedGame}
+          onClick={setSelectedGame}
           openNewGameModal={() => {
             setShowNewGameModal(true);
           }}
         />
       </BackgroundWrapper>
+      <SessionOptionsModal
+        selectedSession={selectedSession}
+        setSelectedSession={setSelectedSession}
+      />
       <NewGameModal
         token={token}
         show={showNewGameModal}
@@ -93,6 +99,7 @@ function Dashboard(props) {
         setGames={setGames}
         selectedGame={selectedGame}
         setSelectedGame={setSelectedGame}
+        setSelectedSession={setSelectedSession}
         showConfirmation={showConfirmation}
         confirmDialog={confirmDialog}
         setConfirmDialog={setConfirmDialog}

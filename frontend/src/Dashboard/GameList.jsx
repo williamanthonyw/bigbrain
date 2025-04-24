@@ -8,7 +8,7 @@ import {
 } from "react-bootstrap";
 import GameCard from "./GameCard";
 
-function GameList({ games, setSelectedGame, openNewGameModal }) {
+function GameList({ games, onClick, openNewGameModal }) {
 
   return (
     <div className="container-fluid" style={{ overflowX: "auto" }}>
@@ -28,7 +28,7 @@ function GameList({ games, setSelectedGame, openNewGameModal }) {
               <GameCard
                 key={index}
                 game={game}
-                onClick={() => setSelectedGame(game)}
+                onClick={() => onClick(game)}
               />
             ))
           : [...Array(3)].map((e, i) => (
