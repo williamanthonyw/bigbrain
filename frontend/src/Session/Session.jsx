@@ -59,7 +59,7 @@ function Session(props) {
       <SiteLogo className="mt-2 mb-3" />
       <DashboardButton />
       <LogoutButton onClick={props.logout} />
-      <h1 className="text-white">Session {sessionId}</h1>
+      <h1>Session {sessionId}</h1>
       {sessionStatus.active === true ? (
         sessionStatus.position === -1 ? (
           <SessionLobby sessionStatus={sessionStatus} />
