@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Form } from "react-bootstrap";
 import axios from "axios";
 
 const funFacts = [
@@ -113,10 +114,97 @@ function WaitingDotsText() {
   );
 }
 
+function isYouTubeUrl(url) {
+  return /youtu\.?be/.test(url);
+}
+
+function getYouTubeEmbedUrl(url) {
+  try {
+    const yt = new URL(url);
+    if (yt.hostname.includes('youtube.com')) {
+      return `https://www.youtube.com/embed/${yt.searchParams.get('v')}`;
+    } else if (yt.hostname.includes('youtu.be')) {
+      return `https://www.youtube.com/embed/${yt.pathname.slice(1)}`;
+    }
+  } catch (err) {
+    return '';
+  }
+}
+
+
+
+
 function PlayGame(){
 
   const { sessionId, playerId } = useParams();
   const [gameStarted, setGameStarted] = useState(false);
+  const [question, setQuestion] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [userAnswers, setUserAnswers] = useState([]);
+
+  const handleUserAnswer = async (index) => {
+    let updatedAnswers = [];
+
+    if (question.type === 'single' || question.type === 'judgement') {
+      updatedAnswers = [index];
+      setUserAnswers(updatedAnswers);
+    } else if (question.type === 'multiple') {
+      updatedAnswers = userAnswers.includes(index) 
+        ? userAnswers.filter((i) => i !== index)
+        : [...userAnswers, index];
+      setUserAnswers(updatedAnswers);
+    }
+    console.log(updatedAnswers);
+    try{
+      await axios.put(`http://localhost:5005/play/${Number(playerId)}/answer`, {
+        answers: updatedAnswers
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      console.log("Answer submitted: ", updatedAnswers);
+    }
+    
+    catch (err){
+      console.log("Error submitting answers ", err);
+    }
+    
+
+  };
+
+  useEffect(() => {
+    const fetchQuestionDetails = async () => {
+      try{
+        const response = await axios.get(`http://localhost:5005/play/${playerId}/question`, {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        const data = response.data.question;
+        console.log(data);
+
+        setQuestion(data);
+        setTimeRemaining(data.duration);
+      }
+      catch(err){
+        console.error('Error fetching question details', err);
+      }
+    };
+    fetchQuestionDetails();
+  }, [playerId]);
+  
+  // useEffect(() => {
+  //   if (!timeRemaining) return;
+
+  //   const timer = setInterval(() => {
+  //     setTimeRemaining((prev) => (prev > 0) ? prev - 1 : 0);
+  //   }, 1000);
+
+  //   return () => clearInterval(timer);
+  // }, [timeRemaining]);
 
   useEffect(() => {
     const checkGameStatus = async () => {
@@ -161,14 +249,114 @@ function PlayGame(){
         }
         `}
       </style>
-      <div className="d-flex justify-content-center align-items-center flex-column" style={{  background: "linear-gradient(145deg, #2c2f33, #23272a)", color: "white", minHeight: "100vh", padding: "2rem"}}>
+      <div className="d-flex justify-content-center align-items-center flex-column" style={{  background: "linear-gradient(145deg, #2c2f33, #23272a)", color: "white", minHeight: "100vh", textAlign: 'center', padding: "2rem", position: 'relative'}}>
         { gameStarted ? (
           <>
-            <h1>Game started</h1>
+            <h1 className="mb-5" style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'relative', top: "30px"}}>{question.title}</h1>
+            <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining}</div>
+            
+            <div className="mt-5 mb-4 text-center"
+              style={{ 
+                width: '400px',
+                height: '300px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
+              {question.media ? (
+                isYouTubeUrl(question.media) ? ( 
+                  <iframe
+                    src={getYouTubeEmbedUrl(question.media)}
+                    title="YouTube video"
+                    allowFullScreen
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                  />
+
+                ) : (
+                  <img
+                    src={question.media}
+                    alt="Media"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+                )
+              ) : (
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#23272a',
+                  }}
+                >
+                  <i className="bi bi-image" style={{ fontSize: '3rem', color: '#666' }}></i>
+                </div>
+              )}
+            </div>
+            
+            {(question.type === 'single' || question.type === 'multiple') && (
+              <div className="mb-5">
+                <Form.Label className="text-white mb-4">
+                  {question.type === 'single' ? 'Choose One' : 'Choose One or More'}
+                </Form.Label>
+                {question.answers.map((answer, index) => (
+                  <div key={index} className="d-flex align-items-center mb-4">
+                    <Form.Check
+                      type={question.type === 'single' ? 'radio' : 'checkbox'}
+                      name="userAnswer"
+                      checked={question.type.includes(index)}
+                      onChange={() => handleUserAnswer(index)}
+                      className="me-2"
+                    />
+                    <Form.Control
+                      type="text"
+                      value={answer}
+                      disabled
+                      className="bg-dark text-white border-secondary"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {question.type === 'judgement' && (
+              <div className="mt-5">
+                <Form.Label className="text-white mb-4">Select True or False</Form.Label>
+                <div className="d-flex align-items-center mb-3">
+                  <Form.Check
+                    type="radio"
+                    name="userAnswer"
+                    checked={userAnswers.includes(0)}
+                    onChange={() => handleUserAnswer(0)}
+                    className="me-2"
+                  />
+                  <Form.Control
+                    type="text"
+                    value="True"
+                    disabled
+                    className="bg-dark text-white border-secondary"
+                  />
+                </div>
+                <div className="d-flex align-items-center mb-3">
+                  <Form.Check
+                    type="radio"
+                    name="userAnswer"
+                    checked={userAnswers.includes(1)}
+                    onChange={() => handleUserAnswer(1)}
+                    className="me-2"
+                  />
+                  <Form.Control
+                    type="text"
+                    value="False"
+                    disabled
+                    className="bg-dark text-white border-secondary"
+                  />
+                </div>
+              </div>
+            )}
+              
           </>
         ) : (
           <>
-            <h1 style={{ fontSize: "3rem", marginBottom: "1rem", position: 'absolute', top: "30px", left: '50%', transform: "translateX(-50%)"}}>Lobby</h1>
+            <h1 style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'absolute', top: "30px", left: '50%', transform: "translateX(-50%)"}}>Lobby</h1>
             <div style={{ display: "flex", flexDirection: "column",alignItems: "center", gap: "1rem" }}>
               <div style={{ position: "relative",width: "50px",height: "50px", animation: "pulse 1.8s ease-in-out infinite",}}>
                 <div style={{ boxSizing: "border-box",position: "absolute",width: "100%",height: "100%",border: "5px solid #7289da",borderTopColor: "transparent",borderRadius: "50%",animation: "spin 2s linear infinite" }}/>

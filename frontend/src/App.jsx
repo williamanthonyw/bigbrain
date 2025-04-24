@@ -21,15 +21,15 @@ import PlayGame from "./PlayGame";
 function App() {
 
   const [token, setToken] = useState(() => {
-    return localStorage.getItem('token') || null;
+    return sessionStorage.getItem('token') || null;
   });
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
+      sessionStorage.setItem('token', token);
     }
     else {
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
     }
   }, [token]);
   
