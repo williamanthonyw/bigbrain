@@ -47,7 +47,9 @@ function SessionLobby(props) {
       if (response.status === 200) {
         const { status, position } = response.data.data;
         // update the game list with the new sessionId
-        props.setSessionStatus({ sessionStatus, position: position });
+        props.setSessionStatus({ ...sessionStatus, position: position });
+        // marginally slower: fetch status from server
+        await props.fetchStatus();
       }
     } catch (err) {
       console.error("Error hosting game: ", err);

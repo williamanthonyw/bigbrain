@@ -91,6 +91,7 @@ function Session(props) {
           game={game}
           sessionStatus={sessionStatus}
           setSessionStatus={setSessionStatus}
+          fetchStatus={fetchStatus}
         />
       ) : (
         <SessionResults sessionStatus={sessionStatus} />
