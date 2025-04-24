@@ -175,7 +175,7 @@ function PlayGame(){
   };
 
   useEffect(() => {
-    if (!gameStarted || timeRemaining > 0) return;
+    if (!gameStarted || !playerId) return;
   
     const interval = setInterval(async () => {
       try {
@@ -197,7 +197,7 @@ function PlayGame(){
     }, 1000);
   
     return () => clearInterval(interval);
-  }, [gameStarted, timeRemaining, question, playerId]);
+  }, [gameStarted, question, playerId]);
 
   useEffect(() => {
     if (!gameStarted || timeRemaining <= 0) return;
@@ -338,7 +338,7 @@ function PlayGame(){
                       <Form.Check
                         type={question.type === 'single' ? 'radio' : 'checkbox'}
                         name="userAnswer"
-                        checked={question.type.includes(index)}
+                        checked={userAnswers.includes(index)}
                         onChange={() => handleUserAnswer(index)}
                         className="me-2"
                       />
@@ -394,13 +394,20 @@ function PlayGame(){
               <div className="mt-5">
                 <Form.Label className="text-white mb-4">Answers</Form.Label>
                 { question.answers.map((answer, index) => {
-                  const isCorrect = correctAnswers.includes(index);
+                  const isCorrect = correctAnswers.map(Number).includes(index);
                   const userChosen = userAnswers.includes(index);
-                  const isWrong = userChosen && !isCorrect;
+                  const isWrong = !isCorrect;
                   
                   return (
                     <div key={index} className="d-flex align-items-center mb-3">
-                      <Form.Check type="checkbox" checked={userChosen} disabled className="me-2"/>
+                      { question.type === 'multiple' && (
+                        <Form.Check type="checkbox" checked={userChosen} disabled className="me-2"/>
+                      )}
+                      
+                      { (question.type === 'single' || question.type === 'judgement') && (
+                        <Form.Check type="radio" name="userAnswer" checked={userChosen} disabled className="me-2"/>
+                      )}
+
                       <Form.Control type="text" value={answer} disabled className="bg-dark text-white border-secondary me-2"/>
                       { isCorrect && (
                         <span style={{ color: 'limegreen', fontSize: '1.5rem' }}>✓</span>

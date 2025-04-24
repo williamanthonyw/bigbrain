@@ -166,7 +166,7 @@ function QuestionDetails(props) {
             media: question.media,
             type: questionType,
             answers: answers,
-            correctAnswers: correctAnswers,
+            correctAnswers: correctAnswers.map(String),
             duration: Number(questionDuration),
             points: Number(questionPoints)
           };
