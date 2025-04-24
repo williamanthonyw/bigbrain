@@ -1,4 +1,6 @@
 import brainImg from "./assets/brain.png";
+import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const BackgroundWrapper = ({ children }) => {
   return (
@@ -21,4 +23,30 @@ const SiteLogo = () => {
   );
 };
 
-export { BackgroundWrapper, SiteLogo };
+const LogoutButton = ({ onClick }) => {
+  return (
+    <Button
+      variant="danger"
+      onClick={onClick}
+      style={{ position: "absolute", top: "20px", right: "20px" }}
+    >
+      Logout
+    </Button>
+  );
+};
+
+const DashboardButton = () => {
+  return (
+    <Link to="/dashboard">
+      <Button
+        variant="light"
+        style={{ position: "absolute", top: "20px", left: "20px" }}
+      >
+        {" "}
+        ← Dashboard
+      </Button>
+    </Link>
+  );
+};
+
+export { BackgroundWrapper, SiteLogo, LogoutButton, DashboardButton };
