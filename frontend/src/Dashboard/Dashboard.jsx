@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import brainImg from "../assets/brain.png";
 import { Alert, Button, Card, Fade } from "react-bootstrap";
+import BackgroundWrapper from "../CommonComponents";
 import GameList from "./GameList";
 import NewGameModal from "./NewGameModal";
 import GameOptionsModal from "./GameOptionsModal";
@@ -53,10 +54,7 @@ function Dashboard(props) {
 
   return (
     <>
-      <div
-        className="d-flex flex-column align-items-center vh-100"
-        style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}
-      >
+      <BackgroundWrapper>
         <img
           src={brainImg}
           alt="Brain Logo"
@@ -87,7 +85,7 @@ function Dashboard(props) {
             setShowNewGameModal(true);
           }}
         />
-      </div>
+      </BackgroundWrapper>
       <NewGameModal
         token={token}
         show={showNewGameModal}

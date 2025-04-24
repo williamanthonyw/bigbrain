@@ -89,7 +89,7 @@ function GameOptionsModal({
             View Past Results
           </Button>
           <Link to={`/game/${selectedGame?.gameId}`}>
-            <Button variant="primary" style={{ width: "100%" }} onClick={null}>
+            <Button variant="primary" style={{ width: "100%" }}>
               Edit
             </Button>
           </Link>
