@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import {
@@ -16,9 +16,35 @@ import {
 function SessionLobby(props) {
   const { sessionId } = useParams();
   const [showTooltip, setShowTooltip] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   const sessionStatus = props.sessionStatus;
   const gameURL = `${window.location.origin}/play?pin=${sessionId}`;
+
+  // update the question timer
+  useEffect(() => {
+    // exit if in lobby
+    if (
+      sessionStatus.position === -1 ||
+      !sessionStatus.questions ||
+      sessionStatus.position >= sessionStatus.questions.length
+    )
+      return;
+    const question = sessionStatus.questions[sessionStatus.position];
+    const startTime = new Date(sessionStatus.isoTimeLastQuestionStarted);
+    const endTime = new Date(startTime.getTime() + question.duration * 1000);
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = Math.max(0, (endTime - now) / 1000);
+      setTimeLeft(diff);
+    };
+
+    updateCountdown(); // initial call
+    const interval = setInterval(updateCountdown, 100);
+
+    return () => clearInterval(interval);
+  }, [sessionStatus.position, sessionStatus.isoTimeLastQuestionStarted]);
 
   const copyToClipboard = async () => {
     try {
@@ -30,12 +56,12 @@ function SessionLobby(props) {
     }
   };
 
-  const advanceGame = async () => {
+  const mutateGame = async (mutationType) => {
     try {
       const response = await axios.post(
         `http://localhost:5005/admin/game/${props.game.gameId}/mutate`,
         {
-          mutationType: "ADVANCE",
+          mutationType: mutationType,
         },
         {
           headers: {
@@ -47,7 +73,9 @@ function SessionLobby(props) {
       if (response.status === 200) {
         const { status, position } = response.data.data;
         // update the game list with the new sessionId
-        props.setSessionStatus({ ...sessionStatus, position: position });
+        if (mutationType === "ADVANCE") {
+          props.setSessionStatus({ ...sessionStatus, position: position });
+        }
         // marginally slower: fetch status from server
         await props.fetchStatus();
       }
@@ -84,10 +112,12 @@ function SessionLobby(props) {
               sessionStatus.questions.length
             }`}
           </h2>
-          <h3>{`Time remaining: ${1}s`}</h3>
+          <h3
+            style={{ marginBottom: "5.6rem" }}
+          >{`Time remaining: ${timeLeft?.toFixed(1)}s`}</h3>
         </>
       )}
-      <h3>Players</h3>
+      <h3 style={{ marginTop: "3rem" }}>Players</h3>
       <ListGroup>
         {sessionStatus.players.length !== 0 ? (
           sessionStatus.players.map((player, index) => (
@@ -99,10 +129,17 @@ function SessionLobby(props) {
       </ListGroup>
       <Button
         variant="primary"
-        style={{ width: "100%", marginTop: "10px" }}
-        onClick={advanceGame}
+        style={{ width: "100%", marginTop: "20px" }}
+        onClick={() => mutateGame("ADVANCE")}
       >
-        {sessionStatus.position === -1 ? "Start Game" : "Next Question"}
+        {sessionStatus.position === -1 ? "Start Session" : "Next Question"}
+      </Button>
+      <Button
+        variant="danger"
+        style={{ width: "100%", marginTop: "10px" }}
+        onClick={() => mutateGame("END")}
+      >
+        Stop Session
       </Button>
     </div>
   );
