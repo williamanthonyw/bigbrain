@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import {
   Button,
   FormControl,
@@ -10,10 +12,28 @@ import {
   Tooltip,
 } from "react-bootstrap";
 
-function SessionOptionsModal({ selectedSession, setSelectedSession }) {
+function SessionOptionsModal({
+  token,
+  games,
+  setGames,
+  selectedGame,
+  setSelectedGame,
+  showConfirmation,
+  setErrorMessage,
+  setShowErrorAlert,
+}) {
+  const [savedSessionId, setSavedSessionId] = useState(0);
+  const [sessionStatus, setSessionStatus] = useState(null);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const gameURL = `${window.location.origin}/play?pin=${selectedSession?.active}`;
+  // keep track of the sessionId for the game
+  useEffect(() => {
+    if (selectedGame?.active) {
+      setSavedSessionId(selectedGame.active);
+    }
+  }, [selectedGame]);
+
+  const gameURL = `${window.location.origin}/play?pin=${savedSessionId}`;
 
   const copyToClipboard = async () => {
     try {
@@ -90,58 +110,66 @@ function SessionOptionsModal({ selectedSession, setSelectedSession }) {
 
   return (
     <Modal
-      show={selectedSession !== null}
-      onHide={() => setSelectedSession(null)}
+      show={selectedGame !== null}
+      onHide={() => setSelectedGame(null)}
       centered
     >
       <Modal.Header closeButton>
         <Modal.Title>
-          {selectedSession?.title || `Game ${selectedSession?.gameId}`}
+          {selectedGame?.title || `Game ${selectedGame?.gameId}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <FormGroup>
-          <FormLabel>URL</FormLabel>
-          <InputGroup className="mb-3">
-            <FormControl readOnly placeholder="URL" value={gameURL} />
-            <OverlayTrigger
-              placement="top"
-              overlay={<Tooltip className="copy-tooltip">Copied!</Tooltip>}
-              show={showTooltip}
-            >
-              <Button variant="outline-secondary" onClick={copyToClipboard}>
-                <i className="bi bi-clipboard"></i>
+        <div className="d-flex flex-column" style={{ gap: "10px" }}>
+          <FormGroup>
+            <FormLabel>Invite Link 📩</FormLabel>
+            <InputGroup className="mb-3">
+              <FormControl readOnly placeholder="URL" value={gameURL} />
+              <OverlayTrigger
+                placement="top"
+                overlay={<Tooltip className="copy-tooltip">Copied!</Tooltip>}
+                show={showTooltip}
+              >
+                <Button variant="outline-secondary" onClick={copyToClipboard}>
+                  <i className="bi bi-clipboard"></i>
+                </Button>
+              </OverlayTrigger>
+            </InputGroup>
+          </FormGroup>
+          {sessionStatus.active ? (
+            <>
+              <Link to={`/session/${selectedGame?.active}`}>
+                <Button variant="primary" style={{ width: "100%" }}>
+                  Manage Session
+                </Button>
+              </Link>
+              <Button
+                variant="danger"
+                onClick={() =>
+                  showConfirmation(
+                    "End Game Session",
+                    "Are you sure you want to end this game session?",
+                    "danger",
+                    endGame
+                  )
+                }
+              >
+                Stop Session
               </Button>
-            </OverlayTrigger>
-          </InputGroup>
-        </FormGroup>
-        <Button
-          variant="primary"
-          onClick={() => {
-            // Handle start session logic here
-            setSelectedSession(null);
-          }}
-        >
-          Start Session
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            // Handle edit session logic here
-            setSelectedSession(null);
-          }}
-        >
-          Edit Session
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => {
-            // Handle delete session logic here
-            setSelectedSession(null);
-          }}
-        >
-          Delete Session
-        </Button>
+            </>
+          ) : (
+            <>
+              <Link to={`/session/${selectedGame?.active}`}>
+                <Button variant="primary" style={{ width: "100%" }}>
+                  View Results
+                </Button>
+              </Link>
+              <Button disabled variant="danger">
+                Game Already Ended
+              </Button>
+            </>
+          )}
+        </div>
       </Modal.Body>
     </Modal>
   );

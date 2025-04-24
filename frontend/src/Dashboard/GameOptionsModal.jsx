@@ -8,7 +8,7 @@ function GameOptionsModal({
   setGames,
   selectedGame,
   setSelectedGame,
-  setSelectedSession,
+  setSelectedGameSession,
   showConfirmation,
   confirmDialog,
   setConfirmDialog,
@@ -39,8 +39,7 @@ function GameOptionsModal({
           )
         );
         setSelectedGame(null);
-        setSelectedSession(selectedGame);
-        // TODO: show custom modal for showing session URL
+        setSelectedGameSession({...selectedGame, active: sessionId});
       }
     } catch (err) {
       console.error("Error hosting game: ", err);

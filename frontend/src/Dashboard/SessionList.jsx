@@ -4,7 +4,10 @@ import SessionCard from "./SessionCard";
 
 function SessionList({ games, onClick }) {
   return (
-    <div className="container-fluid" style={{ overflowX: "auto" }}>
+    <div
+      className="container-fluid"
+      style={{ minHeight: "12rem", overflowX: "auto" }}
+    >
       <div className="d-flex flex-row flex-nowrap">
         {games !== null // sort by most recently created
           ? games
