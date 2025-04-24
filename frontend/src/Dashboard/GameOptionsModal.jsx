@@ -74,16 +74,14 @@ function GameOptionsModal({
             variant="success"
             onClick={() =>
               showConfirmation(
-                "Host Game",
-                "Are you sure you want to host this game?",
+                "Start Game",
+                "Are you sure you want to start this game?",
                 "success",
-                () => {
-                  // Trigger host logic here
-                }
+                hostGame
               )
             }
           >
-            Host
+            Start Game
           </Button>
           <Button variant="secondary" onClick={null}>
             View Past Results
@@ -100,7 +98,7 @@ function GameOptionsModal({
                 "Delete Game",
                 "Are you sure you want to delete this game?",
                 "danger",
-                () => deleteGame()
+                deleteGame
               )
             }
           >
