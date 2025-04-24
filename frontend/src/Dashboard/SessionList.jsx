@@ -9,18 +9,23 @@ function SessionList({ games, onClick }) {
       style={{ minHeight: "12rem", overflowX: "auto" }}
     >
       <div className="d-flex flex-row flex-nowrap">
-        {games !== null // sort by most recently created
-          ? games
-            .filter((game) => game.active && game.active !== null)
-            .sort((a, b) => b.dateCreated - a.dateCreated)
-            .map((game, index) => (
-              <SessionCard
-                key={index}
-                game={game}
-                onClick={() => onClick(game)}
-              />
-            ))
-          : [...Array(3)].map((e, i) => (
+        {games !== null ? (
+          games.filter((game) => game.active && game.active !== null).length !== 0 ? (
+            games
+              .filter((game) => game.active && game.active !== null)
+              .sort((a, b) => b.dateCreated - a.dateCreated)
+              .map((game, index) => (
+                <SessionCard
+                  key={index}
+                  game={game}
+                  onClick={() => onClick(game)}
+                />
+              ))
+          ) : (
+            <p className="text-white">No active sessions!</p>
+          )
+        ) : (
+          [...Array(3)].map((e, i) => (
             <span key={i}>
               <Card style={{ minHeight: "12rem", minWidth: "10rem" }}>
                 <CardBody>
@@ -35,7 +40,8 @@ function SessionList({ games, onClick }) {
                 </CardBody>
               </Card>
             </span>
-          ))}
+          ))
+        )}
       </div>
     </div>
   );
