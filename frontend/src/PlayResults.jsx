@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { timeDelta, questionScore } from "./scoring.js";
 
 function PlayResults(){
 
@@ -88,9 +89,8 @@ function PlayResults(){
           </p>
           {results && results.map((res, index) =>  {
             const timeTaken = res.answers && res.answers.length > 0
-              ? Math.round((new Date(res.answeredAt) - new Date(res.questionStartedAt)) / 1000)
-              : "0";
-            const pointsEarned = res.correct ? Math.round((questionPoints[index] + (((questionDurations[index]-timeTaken)/questionDurations[index]) * questionPoints[index])) * 10) / 10 || 0 : 0;
+              ? timeDelta(res.questionStartedAt, res.answeredAt) : "0";
+            const pointsEarned = questionScore(res.correct, questionPoints[index], questionDurations[index], timeTaken);
 
             return (
               <div
@@ -121,8 +121,8 @@ function PlayResults(){
                 </div>
           
                 <div className="d-flex justify-content-between w-100" style={{ color: "#bbb", fontSize: "0.95rem" }}>
-                  <span>⏱ Time Taken: {timeTaken}s</span>
-                  <span>🏆 Points Earned: {pointsEarned}</span>
+                  <span>⏱ Time Taken: {timeTaken.toFixed(0)}s</span>
+                  <span>🏆 Points Earned: {pointsEarned.toFixed(1)}</span>
                 </div>
               </div>
             );
