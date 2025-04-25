@@ -23,15 +23,15 @@ import PlayResults from "./PlayResults";
 function App() {
 
   const [token, setToken] = useState(() => {
-    return sessionStorage.getItem('token') || null;
+    return localStorage.getItem('token') || null;
   });
 
   useEffect(() => {
     if (token) {
-      sessionStorage.setItem('token', token);
+      localStorage.setItem('token', token);
     }
     else {
-      sessionStorage.removeItem('token');
+      localStorage.removeItem('token');
     }
   }, [token]);
   
@@ -53,7 +53,7 @@ function AppRoutes({ token, setToken }) {
         }
       });
       setToken(null);
-      sessionStorage.removeItem("email");
+      localStorage.removeItem("email");
       navigate('/');
     }
     catch(err){

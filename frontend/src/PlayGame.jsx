@@ -207,7 +207,7 @@ function PlayGame(){
           }
 
           setQuestion(newQuestion);
-          setTimeRemaining(newQuestion.duration);
+          // setTimeRemaining(newQuestion.duration);
           setUserAnswers([]);
           setCorrectAnswers([]);
         }
@@ -228,21 +228,24 @@ function PlayGame(){
     return () => clearInterval(intervalRef.current);
   }, [gameStarted, playerId, question, navigate, sessionId]);
 
+  // update the question timer, copied from SessionLobby.jsx
   useEffect(() => {
-    if (!gameStarted || timeRemaining <= 0) return;
+    // exit if in lobby
+    if (!gameStarted || question ===  null) return;
+    const startTime = new Date(question.isoTimeLastQuestionStarted);
+    const endTime = new Date(startTime.getTime() + question.duration * 1000);
 
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => (prev > 0) ? prev - 1 : 0);
-    }, 1000);
+    const updateCountdown = () => {
+      const now = new Date();
+      const diff = Math.max(0, (endTime - now) / 1000);
+      setTimeRemaining(diff);
+    };
 
-    return () => clearInterval(timer);
-  }, [gameStarted, timeRemaining]);
+    updateCountdown(); // initial call
+    const interval = setInterval(updateCountdown, 100);
 
-  useEffect(() => {
-    if (timeRemaining === 0) {
-      clearInterval();
-    }
-  }, [timeRemaining]);
+    return () => clearInterval(interval);
+  }, [gameStarted, question?.id]);
 
   useEffect(() => {
     const checkGameStatus = async () => {
@@ -326,7 +329,7 @@ function PlayGame(){
           timeRemaining > 0 ? (
             <>
               <h1 className="mb-5" style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'relative', top: "30px"}}>{question.title}</h1>
-              <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining}</div>
+              <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining?.toFixed(1)}</div>
               
               <div className="mt-5 mb-4 text-center"
                 style={{ 
