@@ -128,6 +128,7 @@ function getYouTubeEmbedUrl(url) {
       return `https://www.youtube.com/embed/${yt.pathname.slice(1)}`;
     }
   } catch (err) {
+    console.error(err);
     return '';
   }
 }
@@ -306,22 +307,45 @@ function PlayGame(){
     <>
       <style>
         {`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes spin-rev {
-          to { transform: rotate(-360deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-        }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+          @keyframes spin-rev {
+            to { transform: rotate(-360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+          }
 
-        div[style*="spin"],
-        div[style*="spin-rev"],
-        div[style*="pulse"] {
-          transform-origin: center;
-        }
+          div[style*="spin"],
+          div[style*="spin-rev"],
+          div[style*="pulse"] {
+            transform-origin: center;
+          }
+          @media (max-width: 768px) {
+            h1 {
+              font-size: 2rem !important;
+            }
+
+            .form-control {
+              font-size: 1rem !important;
+            }
+
+            .form-check-input {
+              transform: scale(1.1);
+            }
+
+            .media-box {
+              width: 90vw !important;
+              aspect-ratio: 4 / 3;
+            }
+
+            .spinner-box {
+              width: 40px !important;
+              height: 40px !important;
+            }
+          }
         `}
       </style>
       <div className="d-flex justify-content-center align-items-center flex-column" style={{  background: "linear-gradient(145deg, #2c2f33, #23272a)", color: "white", minHeight: "100vh", textAlign: 'center', padding: "2rem", position: 'relative'}}>
@@ -331,7 +355,7 @@ function PlayGame(){
               <h1 className="mb-5" style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'relative', top: "30px"}}>{question.title}</h1>
               <div style={{ position: 'absolute', top: "30px", right: "30px", backgroundColor: "#7289da", color: "white", padding: "0.5rem 1rem", borderRadius: "0.5rem", fontWeight: 'bold', fontSize: '1.5rem', boxShadow: "0 0 8px rgba(0,0,0,0.2)"}}>{timeRemaining?.toFixed(1)}</div>
               
-              <div className="mt-5 mb-4 text-center"
+              <div className="mt-5 mb-4 text-center media-box"
                 style={{ 
                   width: '400px',
                   height: '300px',
@@ -468,7 +492,7 @@ function PlayGame(){
           <>
             <h1 style={{ fontSize: "3.5rem", marginBottom: "1rem", position: 'absolute', top: "30px", left: '50%', transform: "translateX(-50%)"}}>Lobby</h1>
             <div style={{ display: "flex", flexDirection: "column",alignItems: "center", gap: "1rem" }}>
-              <div style={{ position: "relative",width: "50px",height: "50px", animation: "pulse 1.8s ease-in-out infinite",}}>
+              <div className="spinner-box" style={{ position: "relative", width: "50px",height: "50px", animation: "pulse 1.8s ease-in-out infinite",}}>
                 <div style={{ boxSizing: "border-box",position: "absolute",width: "100%",height: "100%",border: "5px solid #7289da",borderTopColor: "transparent",borderRadius: "50%",animation: "spin 2s linear infinite" }}/>
                 <div style={{ boxSizing: "border-box", position: "absolute",width: "100%",height: "100%",border: "5px solid #99aab5",borderBottomColor: "transparent",borderRadius: "50%",animation: "spin-rev 3s linear infinite" }}/>
               </div>
