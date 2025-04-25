@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Table, Tooltip } from "react-bootstrap";
-import { questionScore, timeDelta } from "../scoring";
+import { Table } from "react-bootstrap";
+import { questionScore, timeDelta, scoreText } from "../scoring";
 import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from "recharts";
 
 function SessionResults(props) {
@@ -65,7 +65,7 @@ function SessionResults(props) {
       }, 0);
       return {
         questionTitle: "Q" + (i + 1),
-        avgCorrect: correctCount * 100 / results.length,
+        avgCorrect: (correctCount * 100) / results.length,
         avgTime: avgTime / results.length,
       };
     });
@@ -109,34 +109,33 @@ function SessionResults(props) {
               })}
         </tbody>
       </Table>
-      <div>
-        <LineChart
-          width={400}
-          height={300}
-          data={questionStats}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="questionTitle" />
-          <YAxis yAxisId="left" domain={[0, 100]} />
-          <YAxis yAxisId="right" orientation="right" />
-          <Legend />
-          <Line
-            yAxisId="left"
-            type="monotone"
-            dataKey="avgCorrect"
-            stroke="#8884d8"
-            name="Correct %"
-          />
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="avgTime"
-            stroke="#82ca9d"
-            name="Avg Time (s)"
-          />
-        </LineChart>
-      </div>
+      <LineChart
+        width={400}
+        height={300}
+        data={questionStats}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="questionTitle" />
+        <YAxis yAxisId="left" domain={[0, 100]} />
+        <YAxis yAxisId="right" orientation="right" />
+        <Legend />
+        <Line
+          yAxisId="left"
+          type="monotone"
+          dataKey="avgCorrect"
+          stroke="#8884d8"
+          name="Correct %"
+        />
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="avgTime"
+          stroke="#82ca9d"
+          name="Avg Time (s)"
+        />
+      </LineChart>
+      <p>{scoreText()}</p>
     </>
   );
 }

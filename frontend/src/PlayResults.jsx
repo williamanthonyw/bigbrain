@@ -1,34 +1,37 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { timeDelta, questionScore } from "./scoring.js";
+import { timeDelta, questionScore, scoreText } from "./scoring.js";
 
-function PlayResults(){
-
+function PlayResults() {
   const { playerId } = useParams();
   const [results, setResults] = useState(null);
   const navigate = useNavigate();
-  const questionPoints = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
-  const questionDurations = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");  
+  const questionPoints = JSON.parse(
+    sessionStorage.getItem("questionPoints") || "[]"
+  );
+  const questionDurations = JSON.parse(
+    sessionStorage.getItem("questionDurations") || "[]"
+  );
 
   useEffect(() => {
-      
     const fetchResults = async () => {
-
       try {
-        const response = await axios.get(`http://localhost:5005/play/${playerId}/results`, {
-          headers: {
-            Accept: 'application/json'
+        const response = await axios.get(
+          `http://localhost:5005/play/${playerId}/results`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
           }
-        });
+        );
 
         setResults(response.data);
         console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching results", err);
       }
-      catch (err){
-        console.error('Error fetching results', err);
-      }
-    }
+    };
     fetchResults();
   }, []);
 
@@ -60,14 +63,15 @@ function PlayResults(){
           }
         `}
       </style>
-      <div className="d-flex justify-content-center align-items-center flex-column"
+      <div
+        className="d-flex justify-content-center align-items-center flex-column"
         style={{
           minHeight: "100vh",
           background: "linear-gradient(145deg, #2c2f33, #23272a)",
           color: "#fff",
           padding: "2rem",
-          fontFamily: 'system-ui, sans-serif',
-          textAlign: 'center'
+          fontFamily: "system-ui, sans-serif",
+          textAlign: "center",
         }}
       >
         <div
@@ -78,56 +82,77 @@ function PlayResults(){
             padding: "2rem 3rem",
             boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
             width: "100%",
-            maxWidth: "600px"
+            maxWidth: "600px",
           }}
         >
-          <h1 className="results-header" style={{ fontSize: "2.5rem", color: "#7289da", marginBottom: "1rem" }}>
+          <h1
+            className="results-header"
+            style={{
+              fontSize: "2.5rem",
+              color: "#7289da",
+              marginBottom: "1rem",
+            }}
+          >
             🎉 Quiz Complete!
           </h1>
-          <p className="results-subtext" style={{ fontSize: "1.2rem", color: "#ccc", marginBottom: "2rem" }}>
+          <p
+            className="results-subtext"
+            style={{ fontSize: "1.2rem", color: "#ccc", marginBottom: "2rem" }}
+          >
             Here are your results:
           </p>
-          {results && results.map((res, index) =>  {
-            const timeTaken = res.answers && res.answers.length > 0
-              ? timeDelta(res.questionStartedAt, res.answeredAt) : "0";
-            const pointsEarned = questionScore(res.correct, questionPoints[index], questionDurations[index], timeTaken);
+          {results &&
+            results.map((res, index) => {
+              const timeTaken =
+                res.answers && res.answers.length > 0
+                  ? timeDelta(res.questionStartedAt, res.answeredAt)
+                  : "0";
+              const pointsEarned = questionScore(
+                res.correct,
+                questionPoints[index],
+                questionDurations[index],
+                timeTaken
+              );
 
-            return (
-              <div
-                key={index}
-                className="results-card"
-                style={{
-                  backgroundColor: "#36393f",
-                  borderRadius: "10px",
-                  padding: "1rem 1.5rem",
-                  marginBottom: "1rem",
-                  display: "flex",
-                  flexDirection: "column"
-                }}
-              >
-                <div className="d-flex justify-content-between align-items-center w-100 mb-2">
-                  <span style={{ fontWeight: "500", fontSize: "1rem" }}>
-                    Question {index + 1}
-                  </span>
-                  <span
-                    style={{
-                      fontWeight: "bold",
-                      color: res.correct ? "limegreen" : "red",
-                      fontSize: "1.2rem"
-                    }}
+              return (
+                <div
+                  key={index}
+                  className="results-card"
+                  style={{
+                    backgroundColor: "#36393f",
+                    borderRadius: "10px",
+                    padding: "1rem 1.5rem",
+                    marginBottom: "1rem",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <div className="d-flex justify-content-between align-items-center w-100 mb-2">
+                    <span style={{ fontWeight: "500", fontSize: "1rem" }}>
+                      Question {index + 1}
+                    </span>
+                    <span
+                      style={{
+                        fontWeight: "bold",
+                        color: res.correct ? "limegreen" : "red",
+                        fontSize: "1.2rem",
+                      }}
+                    >
+                      {res.correct ? "✅ Correct" : "❌ Incorrect"}
+                    </span>
+                  </div>
+
+                  <div
+                    className="d-flex justify-content-between w-100"
+                    style={{ color: "#bbb", fontSize: "0.95rem" }}
                   >
-                    {res.correct ? "✅ Correct" : "❌ Incorrect"}
-                  </span>
+                    <span>⏱ Time Taken: {timeTaken.toFixed(0)}s</span>
+                    <span>🏆 Points Earned: {pointsEarned.toFixed(1)}</span>
+                  </div>
                 </div>
-          
-                <div className="d-flex justify-content-between w-100" style={{ color: "#bbb", fontSize: "0.95rem" }}>
-                  <span>⏱ Time Taken: {timeTaken.toFixed(0)}s</span>
-                  <span>🏆 Points Earned: {pointsEarned.toFixed(1)}</span>
-                </div>
-              </div>
-            );
-          })}
-          
+              );
+            })}
+          <p>{scoreText()}</p>
           <div className="d-flex justify-content-center gap-3">
             <button
               className="btn btn-outline-light"
@@ -155,7 +180,6 @@ function PlayResults(){
         </div>
       </div>
     </>
-    
   );
 }
 
