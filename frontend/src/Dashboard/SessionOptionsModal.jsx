@@ -89,7 +89,6 @@ function SessionOptionsModal({
         }
       );
       if (response.status === 200) {
-        const { status } = response.data.data;
         // update the game list with the new sessionId
         setGames(
           games.map((g) =>

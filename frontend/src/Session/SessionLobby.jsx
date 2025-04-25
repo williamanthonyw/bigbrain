@@ -71,7 +71,7 @@ function SessionLobby(props) {
         }
       );
       if (response.status === 200) {
-        const { status, position } = response.data.data;
+        const { position } = response.data.data;
         // update the game list with the new sessionId
         if (mutationType === "ADVANCE") {
           props.setSessionStatus({ ...sessionStatus, position: position });
@@ -132,7 +132,7 @@ function SessionLobby(props) {
         style={{ width: "100%", marginTop: "20px" }}
         onClick={() => mutateGame("ADVANCE")}
       >
-        {sessionStatus.position === -1 ? "Start Session" : "Next Question"}
+        {sessionStatus.position === -1 ? "Start Session" : timeLeft > 0 ? "Skip Question" : "Next Question"}
       </Button>
       <Button
         variant="danger"
