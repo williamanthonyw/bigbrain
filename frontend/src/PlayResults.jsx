@@ -4,7 +4,7 @@ import axios from "axios";
 
 function PlayResults(){
 
-  const { sessionId, playerId } = useParams();
+  const { playerId } = useParams();
   const [results, setResults] = useState(null);
   const navigate = useNavigate();
   const questionPoints = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
