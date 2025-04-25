@@ -47,10 +47,11 @@ function Session(props) {
       let game = games.find((game) => game.active == sessionId);
       // If not found, check oldSessions
       if (!game) {
-        const oldSessions = games.flatMap((game) => game.oldSessions);
-        game = oldSessions.find((oldSession) => oldSession == sessionId);
+        game = games.find((game) =>
+          game.oldSessions.includes(parseInt(sessionId))
+        );
       }
-      setGame(game);
+      return game;
     } catch (error) {
       console.error("Error fetching game ID:", error);
     }
@@ -59,10 +60,15 @@ function Session(props) {
   // run once on load
   useEffect(() => {
     if (sessionId) fetchStatus();
-    setGame(getGamefromSessionId());
+    const fetchGame = async () => {
+      const fetchedGame = await getGamefromSessionId();
+      setGame(fetchedGame);
+    };
+    fetchGame();
   }, [sessionId]);
 
   // check for new players every second while in lobby
+  // also trigger once each time the question changes
   useEffect(() => {
     if (!sessionStatus?.active || sessionStatus?.position !== -1) return;
     const interval = setInterval(fetchStatus, 1000);
@@ -93,7 +99,11 @@ function Session(props) {
           fetchStatus={fetchStatus}
         />
       ) : (
-        <SessionResults sessionStatus={sessionStatus} />
+        <SessionResults
+          token={props.token}
+          game={game}
+          sessionStatus={sessionStatus}
+        />
       )}
     </BackgroundWrapper>
   );

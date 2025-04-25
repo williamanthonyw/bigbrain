@@ -1,6 +1,13 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import {
+  Button,
+  Dropdown,
+  DropdownMenu,
+  DropdownToggle,
+  DropdownItem,
+  Modal,
+} from "react-bootstrap";
 
 function GameOptionsModal({
   token,
@@ -39,7 +46,7 @@ function GameOptionsModal({
           )
         );
         setSelectedGame(null);
-        setSelectedGameSession({...selectedGame, active: sessionId});
+        setSelectedGameSession({ ...selectedGame, active: sessionId });
       }
     } catch (err) {
       console.error("Error hosting game: ", err);
@@ -106,15 +113,12 @@ function GameOptionsModal({
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="d-flex flex-column" style={{ gap: "10px" }}>
+        <div className="d-flex flex-column gap-2">
           {
             // disable start game button if game is already active
             selectedGame?.active && selectedGame?.active !== null ? (
               <>
-                <Button
-                  disabled
-                  variant="success"
-                >
+                <Button disabled variant="success">
                   Game already active
                 </Button>
               </>
@@ -136,12 +140,37 @@ function GameOptionsModal({
               </>
             )
           }
-
-          <Button variant="secondary" onClick={null}>
-            View Past Results
-          </Button>
+          <Dropdown>
+            {selectedGame?.oldSessions?.length ? (
+              <DropdownToggle variant="secondary" className="w-100">
+                View Past Results
+              </DropdownToggle>
+            ) : (
+              <DropdownToggle variant="secondary" className="w-100" disabled>
+                No Results Available
+              </DropdownToggle>
+            )}
+            <DropdownMenu
+              className="text-center w-100"
+              style={{
+                maxHeight: "calc(50vh - 50px)",
+                overflowY: "auto",
+                display: "block",
+              }}
+            >
+              {selectedGame?.oldSessions?.map((sessionId, index) => (
+                <DropdownItem
+                  key={index}
+                  as={Link}
+                  to={`/session/${sessionId}`}
+                >
+                  {sessionId}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
           <Link to={`/game/${selectedGame?.gameId}`}>
-            <Button variant="primary" style={{ width: "100%" }}>
+            <Button variant="primary" className="w-100">
               Edit
             </Button>
           </Link>

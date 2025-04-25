@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Modal,
   Form,
@@ -8,6 +8,7 @@ import {
   FormLabel,
   FormControl,
 } from "react-bootstrap";
+import verifyJSON from "./jsonUpload.js";
 
 function NewGameModal({
   token,
@@ -22,6 +23,9 @@ function NewGameModal({
   const [newTitle, setNewTitle] = useState("");
   const [newThumbnail, setNewThumbnail] = useState("");
   const [validated, setValidated] = useState(false);
+  const [questionFile, setQuestionFile] = useState(null);
+
+  const JSONInputRef = useRef(null);
 
   const handleThumbnailFileChange = (e) => {
     const file = e.target.files[0];
@@ -35,6 +39,33 @@ function NewGameModal({
       reader.readAsDataURL(file);
     }
   };
+
+  const handleJSONFileChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      try {
+        if (verifyJSON(reader.result)) {
+          setQuestionFile(JSON.parse(reader.result));
+        } else {
+          // clear input if invalid JSON
+          JSONInputRef.current.value = null;
+          setQuestionFile(null);
+          throw new Error("Invalid JSON format");
+        }
+      } catch (err) {
+        console.error("Error reading JSON file: ", err);
+        setShowErrorAlert(true);
+        setErrorMessage("Invalid JSON file format.");
+        setTimeout(() => setShowErrorAlert(false), 5000);
+      }
+    };
+    if (file) {
+      reader.readAsText(file);
+    }
+  };
+
 
   const handleNewGameModalExited = () => {
     setNewTitle("");
@@ -84,8 +115,10 @@ function NewGameModal({
         dateCreated: Date.now(),
         title: newTitle,
         thumbnail: newThumbnail,
-        questions: [],
+        questions: questionFile || [],
       };
+      console.log("questions: ", questionFile);
+      console.log("new game: ", newGame);
       const updatedGames = [...games, newGame];
 
       response = await axios.put(
@@ -128,7 +161,7 @@ function NewGameModal({
           <Modal.Title>Create new game ✏️</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FormGroup>
+          <FormGroup className="mb-3">
             <FormLabel>Name</FormLabel>
             <FormControl
               required
@@ -139,12 +172,21 @@ function NewGameModal({
             />
             <div className="invalid-feedback">Please choose a name.</div>
           </FormGroup>
-          <FormGroup>
+          <FormGroup className="mb-3">
             <FormLabel>Thumbnail (optional)</FormLabel>
             <FormControl
               type="file"
               accept="image/*"
               onChange={handleThumbnailFileChange}
+            />
+          </FormGroup>
+          <FormGroup>
+            <FormLabel>Import Questions (optional)</FormLabel>
+            <FormControl
+              ref={JSONInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleJSONFileChange}
             />
           </FormGroup>
         </Modal.Body>
