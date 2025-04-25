@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi, afterEach, beforeEach } from "vitest";
 import { ThemeProvider } from 'react-bootstrap';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import axios from 'axios';
 
 import Login from '../Login';
@@ -11,10 +11,17 @@ import PlayJoin from '../PlayJoin';
 import PlayGame from '../PlayGame';
 import QuestionDetails from '../QuestionDetails';
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplZmZAZ21haWwuY29tIiwiaWF0IjoxNzQ1NTcwOTM5fQ.uHStShQHtdFJ7-ae863oN2b2FVg922nsHUIQiK-LzeU';
+vi.mock('axios');
+const mockNavigate = vi.fn();
 
-
-
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    useParams: () => ({ gameId: '123', questionId: '456', sessionId: 'session123', playerId: 'player123' }),
+  };
+});
 
 describe('Login Form', () => {
     it('renders and accepts user input', () => {
@@ -106,5 +113,65 @@ describe('Play - Join session - enter name', () => {
 
     fireEvent.change(nameInput, {target: { value: 'jeff'} });
     expect(nameInput.value).toBe('jeff');
+  });
+});
+
+describe('QuestionDetails answer input forms', () => {
+  
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    axios.get.mockResolvedValueOnce({
+      data: {
+        games: [
+          {
+            gameId: '123',
+            questions: [
+              {
+                id: '456',
+                title: 'Sample Question',
+                type: 'single',
+                answers: ['Answer 1', 'Answer 2'],
+                correctAnswers: ['0'],
+                duration: 10,
+                points: 5,
+                media: null
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  it('renders all form fields and allows input interaction', async () => {
+    render(
+      <MemoryRouter>
+        <QuestionDetails token="mock-token" />
+      </MemoryRouter>
+    );
+
+    const titleInput = await screen.findByPlaceholderText('Question Title');
+    expect(titleInput).toBeInTheDocument();
+    fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
+    expect(titleInput.value).toBe('Updated Title');
+
+    const questionType = screen.getByLabelText(/question type/i);
+    expect(questionType).toBeInTheDocument();
+    fireEvent.change(questionType, { target: { value: 'multiple' } });
+    expect(questionType.value).toBe('multiple');
+
+    const durationInput = screen.getByLabelText(/duration/i);
+    fireEvent.change(durationInput, { target: { value: 30 } });
+    expect(durationInput.value).toBe('30');
+
+    const pointsInput = screen.getByLabelText(/points/i);
+    fireEvent.change(pointsInput, { target: { value: 20 } });
+    expect(pointsInput.value).toBe('20');
+
+    const answerInputs = screen.getAllByPlaceholderText(/answer/i);
+    expect(answerInputs).toHaveLength(2);
+    fireEvent.change(answerInputs[0], { target: { value: 'New Answer 1' } });
+    expect(answerInputs[0].value).toBe('New Answer 1');
   });
 });
