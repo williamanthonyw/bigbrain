@@ -63,6 +63,7 @@ function Session(props) {
   }, [sessionId]);
 
   // check for new players every second while in lobby
+  // also trigger once each time the question changes
   useEffect(() => {
     if (!sessionStatus?.active || sessionStatus?.position !== -1) return;
     const interval = setInterval(fetchStatus, 1000);
@@ -93,7 +94,11 @@ function Session(props) {
           fetchStatus={fetchStatus}
         />
       ) : (
-        <SessionResults sessionStatus={sessionStatus} />
+        <SessionResults
+          token={props.token}
+          game={game}
+          sessionStatus={sessionStatus}
+        />
       )}
     </BackgroundWrapper>
   );
