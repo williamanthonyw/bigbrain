@@ -8,22 +8,26 @@ function SessionList({ games, onClick }) {
       className="container-fluid"
       style={{ minHeight: "12rem", overflowX: "auto" }}
     >
-      <div className="d-flex flex-row flex-nowrap">
+      <div
+        className="d-flex flex-row flex-nowrap justify-content-center justify-content-sm-start"
+        style={{ width: "max-content", margin: "0 auto" }}
+      >
         {games !== null ? (
-          games.filter((game) => game.active && game.active !== null).length !== 0 ? (
-            games
-              .filter((game) => game.active && game.active !== null)
-              .sort((a, b) => b.dateCreated - a.dateCreated)
-              .map((game, index) => (
-                <SessionCard
-                  key={index}
-                  game={game}
-                  onClick={() => onClick(game)}
-                />
-              ))
-          ) : (
-            <p className="text-white">No active sessions!</p>
-          )
+          games.filter((game) => game.active && game.active !== null).length !==
+          0 ? (
+              games
+                .filter((game) => game.active && game.active !== null)
+                .sort((a, b) => b.dateCreated - a.dateCreated)
+                .map((game, index) => (
+                  <SessionCard
+                    key={index}
+                    game={game}
+                    onClick={() => onClick(game)}
+                  />
+                ))
+            ) : (
+              <p className="text-white">No active sessions!</p>
+            )
         ) : (
           [...Array(3)].map((e, i) => (
             <span key={i}>
