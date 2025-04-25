@@ -127,7 +127,6 @@ function Login(props) {
               style={{
                 backgroundColor: "#7289da",
                 border: "none",
-                fontWeight: "bold"
               }}
             >
               Log In
