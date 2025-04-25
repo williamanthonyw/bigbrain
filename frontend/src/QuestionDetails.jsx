@@ -256,7 +256,7 @@ function QuestionDetails(props) {
                       color: 'white'
                     }}/>
                 </Form.Group>
-                <div className="mt-4 text-center media-box"
+                <div data-testid="media-box" className="mt-4 text-center media-box"
                   style={{ 
                     width: '400px',
                     height: '300px',
@@ -417,7 +417,7 @@ function QuestionDetails(props) {
         <Modal.Body>
           <Form.Group className="mb-3">
             <Form.Label>Media type</Form.Label>
-            <Form.Select value={mediaType} onChange={(e) => {
+            <Form.Select data-testid="media-type-select" value={mediaType} onChange={(e) => {
               setMediaType(e.target.value);
               setQuestionMedia(null);
             }}>

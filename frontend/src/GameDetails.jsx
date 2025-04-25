@@ -308,7 +308,7 @@ function GameDetails(props){
             <div className='mt-5 mb-5 text-center d-flex justify-content-center align-items-center gap-2 game-header' style={{ flexGrow: 1}}>
               <h2 className='m-0'>{game.title}</h2>
               <Button variant="outline-none" size="sm" onClick={openTitleModal}>✏️</Button>
-              <div className="game-thumbnail"
+              <div  data-testid="game-thumbnail" className="game-thumbnail"
                 style={{
                   width: '100%',
                   maxWidth: '400px',
@@ -342,11 +342,12 @@ function GameDetails(props){
                       height: '100%',
                     }}
                   >
-                    <i className="bi bi-image" style={{ fontSize: '200px', display: 'block', color: '#6c757d' }}></i>
+                    <i data-testid="thumbnail-icon" className="bi bi-image" style={{ fontSize: '200px', display: 'block', color: '#6c757d' }}></i>
                   </div>
                 )}
 
                 <div
+                  data-testid="thumbnail-overlay"
                   onClick={openThumbnailModal}
                   className="d-flex justify-content-center align-items-center"
                   style={{
