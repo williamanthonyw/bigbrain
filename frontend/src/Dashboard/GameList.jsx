@@ -9,10 +9,12 @@ import {
 import GameCard from "./GameCard";
 
 function GameList({ games, onClick, openNewGameModal }) {
-
   return (
     <div className="container-fluid" style={{ overflowX: "auto" }}>
-      <div className="d-flex flex-row flex-nowrap">
+      <div
+        className="d-flex flex-row flex-nowrap justify-content-center justify-content-sm-start"
+        style={{ width: "max-content", margin: "0 auto" }}
+      >
         <Button
           variant="primary"
           className="me-2"
