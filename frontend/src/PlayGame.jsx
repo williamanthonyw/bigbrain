@@ -159,7 +159,7 @@ function PlayGame(){
     }
     try{
       await axios.put(`http://localhost:5005/play/${Number(playerId)}/answer`, {
-        answers: updatedAnswers
+        answers: updatedAnswers.map(String)
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -192,15 +192,6 @@ function PlayGame(){
 
         if (!newQuestion && gameStarted) {
           clearInterval(intervalRef.current);
-
-          if (question) {
-            const pointsArr = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
-            const durationsArr = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
-  
-            sessionStorage.setItem("questionPoints", JSON.stringify([...pointsArr, question.points || 0]));
-            sessionStorage.setItem("questionDurations", JSON.stringify([...durationsArr, question.duration || 0]));
-          }
-
           navigate(`/play/${sessionId}/${playerId}/results`);
           return;
         }
@@ -211,10 +202,10 @@ function PlayGame(){
             const pointsArr = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
             const durationsArr = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
   
-            sessionStorage.setItem("questionPoints", JSON.stringify([...pointsArr, question.points || 0]));
-            sessionStorage.setItem("questionDurations", JSON.stringify([...durationsArr, question.duration || 0]));
+            sessionStorage.setItem("questionPoints", JSON.stringify([...pointsArr, newQuestion.points || 0]));
+            sessionStorage.setItem("questionDurations", JSON.stringify([...durationsArr, newQuestion.duration || 0]));
           }
-          
+
           setQuestion(newQuestion);
           setTimeRemaining(newQuestion.duration);
           setUserAnswers([]);

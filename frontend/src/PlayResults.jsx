@@ -7,6 +7,12 @@ function PlayResults(){
   const { sessionId, playerId } = useParams();
   const [results, setResults] = useState(null);
   const navigate = useNavigate();
+  const questionPoints = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
+  const questionDurations = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
+
+  console.log(questionDurations);
+  console.log(questionPoints);
+  
 
   useEffect(() => {
       
@@ -19,8 +25,8 @@ function PlayResults(){
           }
         });
 
-        console.log(response.data);
         setResults(response.data);
+        console.log(response.data);
       }
       catch (err){
         console.error('Error fetching results', err);
@@ -57,8 +63,11 @@ function PlayResults(){
           <p style={{ fontSize: "1.2rem", color: "#ccc", marginBottom: "2rem" }}>
             Here are your results:
           </p>
-          {results && (
-            results.map((res, index) => (
+          {results && results.map((res, index) =>  {
+            const timeTaken = Math.round((new Date(res.answeredAt) - new Date(res.questionStartedAt)) / 1000);
+            const pointsEarned = res.correct ? Math.round((questionPoints[index] + (((questionDurations[index]-timeTaken)/questionDurations[index]) * questionPoints[index])) * 10) / 10 || 0 : 0;
+
+            return (
               <div
                 key={index}
                 style={{
@@ -67,37 +76,53 @@ function PlayResults(){
                   padding: "1rem 1.5rem",
                   marginBottom: "1rem",
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center"
+                  flexDirection: "column"
                 }}
               >
-                <span style={{ fontWeight: "500" }}>
-                  Question {index + 1}
-                </span>
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color: res.correct ? "limegreen" : "red",
-                    fontSize: "1.2rem"
-                  }}
-                >
-                  {res.correct ? "✅ Correct" : "❌ Incorrect"}
-                </span>
+                {/* ✅ First Row */}
+                <div className="d-flex justify-content-between align-items-center w-100 mb-2">
+                  <span style={{ fontWeight: "500", fontSize: "1rem" }}>
+                    Question {index + 1}
+                  </span>
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color: res.correct ? "limegreen" : "red",
+                      fontSize: "1.2rem"
+                    }}
+                  >
+                    {res.correct ? "✅ Correct" : "❌ Incorrect"}
+                  </span>
+                </div>
+          
+                {/* ✅ Second Row */}
+                <div className="d-flex justify-content-between w-100" style={{ color: "#bbb", fontSize: "0.95rem" }}>
+                  <span>⏱ Time Taken: {timeTaken}s</span>
+                  <span>🏆 Points Earned: {pointsEarned}</span>
+                </div>
               </div>
-            ))
-          )}
+            );
+          })}
           
           <div className="d-flex justify-content-center gap-3">
             <button
               className="btn btn-outline-light"
-              onClick={() => navigate("/")}
+              onClick={() => {
+                sessionStorage.removeItem("questionPoints");
+                sessionStorage.removeItem("questionDurations");
+                navigate("/");
+              }}
               style={{ borderColor: "#7289da", color: "#7289da" }}
             >
               🏠 Back to Home
             </button>
             <button
               className="btn btn-outline-light"
-              onClick={() => navigate(`/play`)}
+              onClick={() => {
+                sessionStorage.removeItem("questionPoints");
+                sessionStorage.removeItem("questionDurations");
+                navigate(`/play`);
+              }}
               style={{ borderColor: "#99aab5", color: "#99aab5" }}
             >
               🔁 Play Again
@@ -106,6 +131,7 @@ function PlayResults(){
         </div>
       </div>
     </>
+    
   )
 }
 
