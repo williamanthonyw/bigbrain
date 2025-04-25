@@ -18,19 +18,20 @@ import QuestionDetails from "./QuestionDetails";
 import Session from "./Session/Session";
 import PlayJoin from "./PlayJoin";
 import PlayGame from "./PlayGame";
+import PlayResults from "./PlayResults";
 
 function App() {
 
   const [token, setToken] = useState(() => {
-    return localStorage.getItem('token') || null;
+    return sessionStorage.getItem('token') || null;
   });
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
+      sessionStorage.setItem('token', token);
     }
     else {
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
     }
   }, [token]);
   
@@ -52,7 +53,7 @@ function AppRoutes({ token, setToken }) {
         }
       });
       setToken(null);
-      localStorage.removeItem("email");
+      sessionStorage.removeItem("email");
       navigate('/');
     }
     catch(err){
@@ -72,6 +73,7 @@ function AppRoutes({ token, setToken }) {
       <Route path="/game/:id" element={<GameDetails token={token} logout={logout}/>} />
       <Route path="/game/:gameId/question/:questionId" element={<QuestionDetails token={token} logout={logout}/>} />
       <Route path="/session/:sessionId" element={<Session token={token} logout={logout}/>} />
+      <Route path="/play/:sessionId/:playerId/results" element={<PlayResults />}/>
       <Route path="/play/:sessionId/:playerId" element={<PlayGame />} />
       <Route path="/play/:sessionId" element={<PlayJoin />} />
     </Routes>

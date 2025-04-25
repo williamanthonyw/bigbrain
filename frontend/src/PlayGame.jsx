@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Form } from "react-bootstrap";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const funFacts = [
   "The first video game was created in 1958!",
@@ -143,6 +144,10 @@ function PlayGame(){
   const [userAnswers, setUserAnswers] = useState([]);
   const [correctAnswers, setCorrectAnswers] = useState([]);
 
+  const navigate = useNavigate();
+  const intervalRef = useRef(null);
+  const hasStarted = useRef(false);
+
   const handleUserAnswer = async (index) => {
     let updatedAnswers = [];
 
@@ -177,13 +182,22 @@ function PlayGame(){
   useEffect(() => {
     if (!gameStarted || !playerId) return;
   
-    const interval = setInterval(async () => {
+    const fetchNextQuestion = async () => {
       try {
         const response = await axios.get(`http://localhost:5005/play/${playerId}/question`, {
-          headers: { Accept: 'application/json' }
+          headers: { 
+            Accept: 'application/json' 
+          }
         });
   
         const newQuestion = response.data.question;
+        console.log(newQuestion);
+
+        if (!newQuestion && gameStarted) {
+          clearInterval(intervalRef.current);
+          navigate(`/play/${sessionId}/${playerId}/results`);
+          return;
+        }
   
         if (!question || newQuestion.id !== question.id) {
           setQuestion(newQuestion);
@@ -191,13 +205,22 @@ function PlayGame(){
           setUserAnswers([]);
           setCorrectAnswers([]);
         }
+        
       } catch (err) {
-        console.error('Error polling for next question:', err);
+        const errorMessage = err.response?.data?.error;
+        console.error(errorMessage);
+
+        if (err.response?.status === 400 && errorMessage === "Session ID is not an active session"){
+          clearInterval(intervalRef.current);
+          navigate(`/play/${sessionId}/${playerId}/results`);
+        }
       }
-    }, 1000);
+    };
+
+    intervalRef.current = setInterval(fetchNextQuestion, 1000);
   
-    return () => clearInterval(interval);
-  }, [gameStarted, question, playerId]);
+    return () => clearInterval(intervalRef.current);
+  }, [gameStarted, playerId, question, navigate, sessionId]);
 
   useEffect(() => {
     if (!gameStarted || timeRemaining <= 0) return;
@@ -223,6 +246,14 @@ function PlayGame(){
             Accept: 'application/json'
           }
         });
+
+        if (response.data.started){
+          hasStarted.current = true;
+        }
+
+        if (hasStarted.current && !response.data.started) {
+          navigate(`/play/${sessionId}/${playerId}/results`);
+        }
 
         setGameStarted(response.data.started);
       }

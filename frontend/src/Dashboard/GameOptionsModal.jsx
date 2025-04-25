@@ -19,7 +19,7 @@ function GameOptionsModal({
   const hostGame = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:5005/admin/game/${selectedGame.gameId}/mutate`,
+        `http://localhost:5005/admin/game/${selectedGame.id}/mutate`,
         {
           mutationType: "START",
         },
@@ -35,7 +35,7 @@ function GameOptionsModal({
         // update the game list with the new sessionId
         setGames(
           games.map((g) =>
-            g.gameId === selectedGame.gameId ? { ...g, active: sessionId } : g
+            g.id === selectedGame.id ? { ...g, active: sessionId } : g
           )
         );
         setSelectedGame(null);
@@ -63,7 +63,7 @@ function GameOptionsModal({
       });
 
       const updatedGames = games.filter(
-        (game) => game.gameId !== selectedGame.gameId
+        (game) => game.id !== selectedGame.id
       );
 
       response = await axios.put(
@@ -102,7 +102,7 @@ function GameOptionsModal({
     >
       <Modal.Header closeButton>
         <Modal.Title>
-          {selectedGame?.title || `Game ${selectedGame?.gameId}`}
+          {selectedGame?.title || `Game ${selectedGame?.id}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -140,7 +140,7 @@ function GameOptionsModal({
           <Button variant="secondary" onClick={null}>
             View Past Results
           </Button>
-          <Link to={`/game/${selectedGame?.gameId}`}>
+          <Link to={`/game/${selectedGame?.id}`}>
             <Button variant="primary" style={{ width: "100%" }}>
               Edit
             </Button>
