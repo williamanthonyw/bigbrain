@@ -34,7 +34,7 @@ function GameDetails(props){
       });
 
       const updatedGames = response.data.games.map(g => {
-        if (g.id == game.id){
+        if (g.gameId == game.gameId){
           return { ...g, title: newTitle};
         }
         return g;
@@ -89,7 +89,7 @@ function GameDetails(props){
       });
   
       const updatedGames = response.data.games.map(g => {
-        if (g.id === game.id) {
+        if (g.gameId === game.gameId) {
           return { ...g, thumbnail: newThumbnail ? newThumbnail : null }; // ⬅️ Use the URL or base64 string
         }
         return g;
@@ -124,7 +124,7 @@ function GameDetails(props){
       });
   
       const updatedGames = response.data.games.map(g => {
-        if (g.id === game.id) {
+        if (g.gameId === game.gameId) {
           return { ...g, thumbnail: null };
         }
         return g;
@@ -172,7 +172,7 @@ function GameDetails(props){
       };
 
       const updatedGames = response.data.games.map(g => {
-        if (g.id == game.id){
+        if (g.gameId == game.gameId){
           return { ...g, questions: [...(g.questions || []), newQuestion]};
         }
         return g;
@@ -204,7 +204,7 @@ function GameDetails(props){
           }
         });
 
-        const findGame = response.data.games.find(game => game.id == id);
+        const findGame = response.data.games.find(game => game.gameId == id);
 
         if (findGame){
           setGame(findGame);
@@ -242,7 +242,7 @@ function GameDetails(props){
       });
   
       const games = response.data.games;
-      const gameIndex = games.findIndex(g => g.id === game.id);
+      const gameIndex = games.findIndex(g => g.gameId === game.gameId);
   
       const updatedQuestions = games[gameIndex].questions.filter(q => q.id !== questionId);
       games[gameIndex].questions = updatedQuestions;
@@ -361,7 +361,7 @@ function GameDetails(props){
                   }}
                   onMouseEnter={e => e.currentTarget.style.backgroundColor = '#3a3d42'}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor = '#2f3136'}>
-                    <div onClick={() => navigate(`/game/${game.id}/question/${question.id}`)} style={{ flexGrow: 1}}>
+                    <div onClick={() => navigate(`/game/${game.gameId}/question/${question.id}`)} style={{ flexGrow: 1}}>
                       <div className="mb-4"><strong style={{ fontSize: '1.5rem' }}>Question {index+1}</strong></div>
                       <div className="d-flex justify-content-between">
                         {question.type ? <div className="text-start">Type: {question.type}</div> : <div></div>}

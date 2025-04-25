@@ -54,7 +54,7 @@ function QuestionDetails(props) {
           }
         });
 
-        const currentGame = response.data.games.find(g => g.id == gameId);
+        const currentGame = response.data.games.find(g => g.gameId == gameId);
         if (!currentGame) {
           return;
         }
@@ -156,7 +156,7 @@ function QuestionDetails(props) {
       });
 
       const games = response.data.games;
-      const gameIndex = games.findIndex(g => g.id == gameId);
+      const gameIndex = games.findIndex(g => g.gameId == gameId);
 
       const updatedQuestions = games[gameIndex].questions.map(q => {
         if (q.id == questionId){

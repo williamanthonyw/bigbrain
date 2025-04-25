@@ -59,7 +59,7 @@ function SessionLobby(props) {
   const mutateGame = async (mutationType) => {
     try {
       const response = await axios.post(
-        `http://localhost:5005/admin/game/${props.game.id}/mutate`,
+        `http://localhost:5005/admin/game/${props.game.gameId}/mutate`,
         {
           mutationType: mutationType,
         },
