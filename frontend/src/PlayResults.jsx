@@ -4,15 +4,11 @@ import axios from "axios";
 
 function PlayResults(){
 
-  const { sessionId, playerId } = useParams();
+  const { playerId } = useParams();
   const [results, setResults] = useState(null);
   const navigate = useNavigate();
   const questionPoints = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
-  const questionDurations = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
-
-  console.log(questionDurations);
-  console.log(questionPoints);
-  
+  const questionDurations = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");  
 
   useEffect(() => {
       
@@ -37,6 +33,32 @@ function PlayResults(){
 
   return (
     <>
+      <style>
+        {`
+          @media (max-width: 600px) {
+            .results-container {
+              padding: 1.5rem 1rem !important;
+            }
+
+            .results-header {
+              font-size: 2rem !important;
+            }
+
+            .results-subtext {
+              font-size: 1rem !important;
+            }
+
+            .results-card {
+              padding: 1rem !important;
+            }
+
+            .btn {
+              font-size: 0.9rem !important;
+              padding: 0.5rem 1rem !important;
+            }
+          }
+        `}
+      </style>
       <div className="d-flex justify-content-center align-items-center flex-column"
         style={{
           minHeight: "100vh",
@@ -48,6 +70,7 @@ function PlayResults(){
         }}
       >
         <div
+          className="results-container"
           style={{
             backgroundColor: "#2f3136",
             borderRadius: "16px",
@@ -57,19 +80,22 @@ function PlayResults(){
             maxWidth: "600px"
           }}
         >
-          <h1 style={{ fontSize: "2.5rem", color: "#7289da", marginBottom: "1rem" }}>
+          <h1 className="results-header" style={{ fontSize: "2.5rem", color: "#7289da", marginBottom: "1rem" }}>
             🎉 Quiz Complete!
           </h1>
-          <p style={{ fontSize: "1.2rem", color: "#ccc", marginBottom: "2rem" }}>
+          <p className="results-subtext" style={{ fontSize: "1.2rem", color: "#ccc", marginBottom: "2rem" }}>
             Here are your results:
           </p>
           {results && results.map((res, index) =>  {
-            const timeTaken = Math.round((new Date(res.answeredAt) - new Date(res.questionStartedAt)) / 1000);
+            const timeTaken = res.answers && res.answers.length > 0
+              ? Math.round((new Date(res.answeredAt) - new Date(res.questionStartedAt)) / 1000)
+              : "0";
             const pointsEarned = res.correct ? Math.round((questionPoints[index] + (((questionDurations[index]-timeTaken)/questionDurations[index]) * questionPoints[index])) * 10) / 10 || 0 : 0;
 
             return (
               <div
                 key={index}
+                className="results-card"
                 style={{
                   backgroundColor: "#36393f",
                   borderRadius: "10px",
@@ -79,7 +105,6 @@ function PlayResults(){
                   flexDirection: "column"
                 }}
               >
-                {/* ✅ First Row */}
                 <div className="d-flex justify-content-between align-items-center w-100 mb-2">
                   <span style={{ fontWeight: "500", fontSize: "1rem" }}>
                     Question {index + 1}
@@ -95,7 +120,6 @@ function PlayResults(){
                   </span>
                 </div>
           
-                {/* ✅ Second Row */}
                 <div className="d-flex justify-content-between w-100" style={{ color: "#bbb", fontSize: "0.95rem" }}>
                   <span>⏱ Time Taken: {timeTaken}s</span>
                   <span>🏆 Points Earned: {pointsEarned}</span>
@@ -132,7 +156,7 @@ function PlayResults(){
       </div>
     </>
     
-  )
+  );
 }
 
 export default PlayResults;

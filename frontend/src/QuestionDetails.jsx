@@ -40,6 +40,7 @@ function QuestionDetails(props) {
         return `https://www.youtube.com/embed/${yt.pathname.slice(1)}`;
       }
     } catch (err) {
+      console.error(err);
       return '';
     }
   }
@@ -212,10 +213,35 @@ function QuestionDetails(props) {
 
   return (
     <>
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .editor-layout {
+              flex-direction: column !important;
+              padding: 1rem !important;
+            }
+
+            .question-editor {
+              padding-right: 0 !important;
+            }
+
+            .media-box {
+              width: 100% !important;
+              height: auto !important;
+              aspect-ratio: 4 / 3;
+            }
+
+            .sidebar {
+              border-left: none !important;
+              border-top: 1px solid #444;
+              margin-top: 2rem;
+            }
+          }
+        `}
+      </style>
       <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", display: 'flex', flexDirection:'column', position: "relative", color: "white", paddingTop: '80px' }}>
-        <div className="d-flex flex-grow-1 mt-5" style={{ padding: '1rem' }}>
-          <div style={{ flex: 4, paddingRight: '1rem'}}>
-            left container
+        <div className="d-flex flex-grow-1 mt-5 editor-layout" style={{ padding: '1rem' }}>
+          <div className="question-editor" style={{ flex: 4, paddingRight: '1rem'}}>
             {question ? (
               <>
                 <Form.Group controlId="questionTitle" className="mb-4">
@@ -229,7 +255,7 @@ function QuestionDetails(props) {
                       color: 'white'
                     }}/>
                 </Form.Group>
-                <div className="mt-4 text-center"
+                <div className="mt-4 text-center media-box"
                   style={{ 
                     width: '400px',
                     height: '300px',
@@ -348,8 +374,7 @@ function QuestionDetails(props) {
               <p>Loading question...</p>
             )}
           </div>
-          <div style={{ flex: 1, backgroundColor: '#1e2124', borderLeft: '1px solid #444', padding: '1rem'}}>
-            right container
+          <div className="sidebar" style={{ flex: 1, backgroundColor: '#1e2124', borderLeft: '1px solid #444', padding: '1rem'}}>
             <Form.Group controlId="questionType" className="mb-3">
               <Form.Label className="text-white"><strong>Question type</strong></Form.Label>
               <Form.Select value={questionType} onChange={(e) => {

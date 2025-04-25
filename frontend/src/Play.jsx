@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import brainImg from "./assets/brain.png";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -32,11 +32,25 @@ function Play() {
             color: #b9bbbe;
             opacity: 1;
           }
+
+          @media (max-width: 500px) {
+            .join-container {
+              padding: 2rem 1.5rem !important;
+            }
+
+            .join-title {
+              font-size: 2rem !important;
+            }
+
+            .pin-input {
+              font-size: 1rem !important;
+            }
+          }
         `}
       </style>
       <div
         className="d-flex flex-column vh-100 justify-content-center align-items-center position-relative"
-        style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)" }}
+        style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", padding: "1rem" }}
       >
         <img
           src={brainImg}
@@ -44,11 +58,12 @@ function Play() {
           className="mb-3"
           style={{ width: "80px", height: "80px" }}
         />
-        <h1 className="mb-5 text-white">BigBrain</h1>
+        <h1 className="mb-5 text-white join-title">BigBrain</h1>
         <Container
-          className="text-center p-5 rounded shadow"
+          className="text-center p-5 rounded shadow join-container"
           style={{
             maxWidth: "500px",
+            width: "100%",
             backgroundColor: "#36393f",
             color: "white",
           }}
@@ -60,7 +75,7 @@ function Play() {
                 placeholder="Enter Game PIN"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="mb-3 form-input"
+                className="mb-3 form-input pin-input"
                 required
                 style={{
                   backgroundColor: "#2c2f33",
@@ -69,6 +84,7 @@ function Play() {
                 }}
               />
             </Form.Group>
+            
             <Button
               variant="primary"
               type="submit"

@@ -56,19 +56,41 @@ function Dashboard(props) {
 
   return (
     <>
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .dashboard-title {
+              font-size: 1.75rem !important;
+            }
+
+            .section-title {
+              font-size: 1.25rem !important;
+            }
+
+            .logout-btn {
+              font-size: 0.85rem;
+              padding: 0.4rem 0.8rem;
+            }
+          }
+        `}
+      </style>
       <BackgroundWrapper>
         <SiteLogo className="mt-2 mb-3" />
-        <h1 className="mb-4 text-white">Dashboard</h1>
+        <h1 className="mb-4 text-white dashboard-title">Dashboard</h1>
+
         <Button
           variant="danger"
           onClick={props.logout}
-          style={{ position: "absolute", top: "20px", right: "20px" }}
+          className="logout-btn"
+          style={{ position: "absolute", top: "20px", right: "20px", zIndex: 1000 }}
         >
           Logout
         </Button>
-        <h2 className="mb-3 text-white">Active Game Sessions</h2>
+
+        <h2 className="mb-3 text-white section-title">Active Game Sessions</h2>
         <SessionList games={games} onClick={setSelectedGameSession} />
-        <h2 className="mt-4 mb-3 text-white">All Games</h2>
+
+        <h2 className="mt-4 mb-3 text-white section-title">All Games</h2>
         <GameList
           games={games}
           onClick={setSelectedGame}
@@ -76,6 +98,7 @@ function Dashboard(props) {
             setShowNewGameModal(true);
           }}
         />
+        
       </BackgroundWrapper>
       <SessionOptionsModal
         token={token}

@@ -1,5 +1,5 @@
 import { Button, Modal } from "react-bootstrap";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -273,20 +273,50 @@ function GameDetails(props){
 
   return (
     <>
+      <style>
+        {`
+        @media (max-width: 768px) {
+          .game-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+          }
+
+          .game-thumbnail {
+            width: 90vw !important;
+            height: 200px !important;
+          }
+
+          .question-card {
+            width: 90vw !important;
+            min-width: unset !important;
+          }
+
+          .logout-btn, .back-btn {
+            top: 10px !important;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.75rem;
+          }
+        }
+        `}
+      </style>
       <div style={{ background: "linear-gradient(145deg, #2c2f33, #23272a)", minHeight: "100vh", display: 'flex', flexDirection:'column', position: "relative", color: "white", paddingTop: '80px' }}>
-        <Button variant='danger' onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
-        <Button variant='light' onClick={goBack} style={{ position: "absolute", top: "20px", left: "20px" }}> ← Back</Button>
+        <Button variant='danger' className="logout-btn" onClick={props.logout} style={{ position: "absolute", top: "20px", right: "20px" }}>Logout</Button>
+        <Button variant='light' className="back-btn" onClick={goBack} style={{ position: "absolute", top: "20px", left: "20px" }}> ← Back</Button>
         {game ? (
           <>
-            <div className='mt-5 mb-5 text-center d-flex justify-content-center align-items-center gap-2' style={{ flexGrow: 1}}>
+            <div className='mt-5 mb-5 text-center d-flex justify-content-center align-items-center gap-2 game-header' style={{ flexGrow: 1}}>
               <h2 className='m-0'>{game.title}</h2>
               <Button variant="outline-none" size="sm" onClick={openTitleModal}>✏️</Button>
-              <div className="position-relative ms-4"
+              <div className="game-thumbnail"
                 style={{
-                  width: '400px',
-                  height: '300px',
+                  width: '100%',
+                  maxWidth: '400px',
+                  aspectRatio: "4 / 3",
                   overflow: 'hidden',
                   display: 'inline-block',
+                  borderRadius: "8px",
+                  position: 'relative'
                 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
@@ -348,7 +378,7 @@ function GameDetails(props){
             >
               {game.questions ? (
                 game.questions.map((question, index) => (
-                  <div key={index} className="mb-3 p-3 rounded d-flex justify-content-between align-items-start"style={{
+                  <div key={index} className="mb-3 p-3 rounded d-flex justify-content-between align-items-start question-card"style={{
                     minWidth: "400px",
                     width: '50vw',
                     minHeight: "120px",
