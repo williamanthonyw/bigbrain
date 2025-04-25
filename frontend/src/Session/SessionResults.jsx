@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Table } from "react-bootstrap";
 import { questionScore, timeDelta, scoreText } from "../scoring";
@@ -7,6 +7,7 @@ import { CartesianGrid, Legend, Line, LineChart, XAxis, YAxis } from "recharts";
 
 function SessionResults(props) {
   const { sessionId } = useParams();
+  const location = useLocation();
   const questions = props.game.questions;
 
   const [results, setResults] = useState(null);
@@ -33,7 +34,7 @@ function SessionResults(props) {
       }
     };
     fetchResults();
-  }, []);
+  }, [sessionId, location]);
 
   // calculate score and time taken for each player/question
   const calculateScores = (results) => {
