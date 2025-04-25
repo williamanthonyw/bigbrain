@@ -321,7 +321,7 @@ function QuestionDetails(props) {
                         <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(String(index))} onChange={() => handleCorrectSelect(index)} className="me-2"/>
                         <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
                         {index >= 2 ? (
-                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
+                          <i data-testid={`delete-answer-${index}`} className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
                         ) : (
                           <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
                         )}
@@ -341,7 +341,7 @@ function QuestionDetails(props) {
                         <Form.Check type="checkbox" checked={correctAnswers.includes(String(index))} onChange={() => toggleCorrectAnswer(index)} className="me-2"/>
                         <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
                         {index >= 2 ? (
-                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
+                          <i data-testid={`delete-answer-${index}`} className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
                         ) : (
                           <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
                         )}
