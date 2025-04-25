@@ -64,6 +64,7 @@ function QuestionDetails(props) {
         if (!findQuestion){
           return;
         }
+        console.log(response);
 
         setQuestion(findQuestion);
         setQuestionTitle(findQuestion.title || "");
