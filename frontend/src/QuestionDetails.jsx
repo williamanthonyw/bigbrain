@@ -88,15 +88,18 @@ function QuestionDetails(props) {
   }
 
   const handleCorrectSelect = (index) => {
-    setCorrectAnswers([index]);
+    setCorrectAnswers([String(index)]);
   }
 
   const toggleCorrectAnswer = (index) => {
-    if (correctAnswers.includes(index)) {
-      setCorrectAnswers(correctAnswers.filter(i => i !== index));
-    } else {
-      setCorrectAnswers([...correctAnswers, index]);
-    }
+    setCorrectAnswers((prev) => {
+      const strIndex = String(index);
+      if (prev.includes(strIndex)) {
+        return prev.filter(i => i !== strIndex); // remove it
+      } else {
+        return [...prev, strIndex]; // add it
+      }
+    });
   };
 
   const addAnswerField = () => {
@@ -110,8 +113,10 @@ function QuestionDetails(props) {
     updatedAnswers.splice(index, 1);
   
     const updatedCorrectAnswers = correctAnswers
-      .filter(i => i !== index) 
-      .map(i => (i > index ? i - 1 : i)); 
+      .map(i => Number(i))                 
+      .filter(i => i !== index)              
+      .map(i => (i > index ? i - 1 : i))     
+      .map(i => String(i));                 
   
     setAnswers(updatedAnswers);
     setCorrectAnswers(updatedCorrectAnswers);
@@ -286,10 +291,10 @@ function QuestionDetails(props) {
                     <Form.Label className="text-white mb-4">Answer Options</Form.Label>
                     {answers.map((answer, index) => (
                       <div key={index} className="d-flex align-items-center mb-4">
-                        <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(index)} onChange={() => handleCorrectSelect(index)} className="me-2"/>
+                        <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(String(index))} onChange={() => handleCorrectSelect(index)} className="me-2"/>
                         <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
                         {index >= 2 ? (
-                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
+                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
                         ) : (
                           <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
                         )}
@@ -306,10 +311,10 @@ function QuestionDetails(props) {
                     <Form.Label className="text-white mb-4">Answer Options</Form.Label>
                     {answers.map((answer, index) => (
                       <div key={index} className="d-flex align-items-center mb-4">
-                        <Form.Check type="checkbox" checked={correctAnswers.includes(index)} onChange={() => toggleCorrectAnswer(index)} className="me-2"/>
+                        <Form.Check type="checkbox" checked={correctAnswers.includes(String(index))} onChange={() => toggleCorrectAnswer(index)} className="me-2"/>
                         <Form.Control type="text" value={answer} onChange={(e) => handleAnswerChange(index, e.target.value)} placeholder={`Answer ${index + 1}`} className="bg-dark text-white border-secondary me-2"/>
                         {index >= 2 ? (
-                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(index)}/>
+                          <i className="bi bi-trash text-danger" style={{ cursor: 'pointer', fontSize: '1.3rem' }} onClick={() => deleteAnswerField(String(index))}/>
                         ) : (
                           <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />
                         )}
@@ -326,11 +331,11 @@ function QuestionDetails(props) {
                     <Form.Label className="text-white mb-4">Answer Options</Form.Label>
                     
                     <div className="d-flex align-items-center mb-3">
-                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(0)} onChange={() => setCorrectAnswers([0])} className="me-2"/>
+                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes('0')} onChange={() => setCorrectAnswers(['0'])} className="me-2"/>
                       <Form.Control type="text" value="True" disabled className="bg-dark text-white border-secondary"/>
                     </div>
                     <div className="d-flex align-items-center mb-3">
-                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes(1)} onChange={() => setCorrectAnswers([1])} className="me-2"/>
+                      <Form.Check type="radio" name="correctAnswer" checked={correctAnswers.includes('1')} onChange={() => setCorrectAnswers(['1'])} className="me-2"/>
                       <Form.Control type="text" value="False" disabled className="bg-dark text-white border-secondary"/>
                     </div>
                     <i className="bi bi-trash " style={{ opacity: 0, fontSize: '1.3rem', pointerEvents: 'none' }} />

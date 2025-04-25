@@ -132,9 +132,6 @@ function getYouTubeEmbedUrl(url) {
   }
 }
 
-
-
-
 function PlayGame(){
 
   const { sessionId, playerId } = useParams();
@@ -195,11 +192,29 @@ function PlayGame(){
 
         if (!newQuestion && gameStarted) {
           clearInterval(intervalRef.current);
+
+          if (question) {
+            const pointsArr = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
+            const durationsArr = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
+  
+            sessionStorage.setItem("questionPoints", JSON.stringify([...pointsArr, question.points || 0]));
+            sessionStorage.setItem("questionDurations", JSON.stringify([...durationsArr, question.duration || 0]));
+          }
+
           navigate(`/play/${sessionId}/${playerId}/results`);
           return;
         }
   
         if (!question || newQuestion.id !== question.id) {
+
+          if (question) {
+            const pointsArr = JSON.parse(sessionStorage.getItem("questionPoints") || "[]");
+            const durationsArr = JSON.parse(sessionStorage.getItem("questionDurations") || "[]");
+  
+            sessionStorage.setItem("questionPoints", JSON.stringify([...pointsArr, question.points || 0]));
+            sessionStorage.setItem("questionDurations", JSON.stringify([...durationsArr, question.duration || 0]));
+          }
+          
           setQuestion(newQuestion);
           setTimeRemaining(newQuestion.duration);
           setUserAnswers([]);

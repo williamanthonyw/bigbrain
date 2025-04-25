@@ -87,7 +87,6 @@ function PlayResults(){
             ))
           )}
           
-
           <div className="d-flex justify-content-center gap-3">
             <button
               className="btn btn-outline-light"
@@ -98,7 +97,7 @@ function PlayResults(){
             </button>
             <button
               className="btn btn-outline-light"
-              onClick={() => navigate(`/play/${sessionId}/${playerId}`)}
+              onClick={() => navigate(`/play`)}
               style={{ borderColor: "#99aab5", color: "#99aab5" }}
             >
               🔁 Play Again
