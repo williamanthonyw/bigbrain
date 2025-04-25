@@ -17,3 +17,7 @@ Component testing:
 
 - Modal component testing: 
     - testing for admin to upload media (image or youtube) in the given modal component
+
+
+UI testing:
+- "\bigbrain\cypress\e2e\happy_path_admin.cy.js"
